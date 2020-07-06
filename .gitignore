@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+*.lp
+*.log
+*.txt
+*.csv
+*.xlsx
