@@ -508,6 +508,7 @@ if __name__ == '__main__':
 
     optimizer.load_data_csv("TC001")
     orders = pd.read_csv(os.path.join('data', 'csv', 'TC001', 'ORDER.csv'))
+    print(orders.to_json(date_format='iso', orient='records'))
     orders['RDD'] = pd.to_datetime(orders['RDD'], format='%m/%d/%Y')
     optimizer.optimize(orders)
     # optimizer.write_solution_csv(os.path.join('data', 'csv', 'TC001', 'sol'))
