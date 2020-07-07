@@ -7,9 +7,17 @@ from collections import defaultdict, namedtuple
 from datetime import date, timedelta
 from docplex.mp.model import Model
 
+DOSOLVER = 'Cloud'
 
-DO_URL = "https://api-oaas.docloud.ibmcloud.com/job_manager/rest/v1"
-DO_KEY = ""
+if DOSOLVER == 'Cloud': 
+    from watson_machine_learning_client import WatsonMachineLearningAPIClient
+    wml_credentials = {
+      "apikey": "CZAWhGYAgk1oCB-UcR_cSWRhEKUwJQGOzxWbxFKqcohz",
+      "instance_id": "955338a9-1470-44bf-ab58-162eacc8113e",
+      "url": "https://us-south.ml.cloud.ibm.com",
+    }
+    client = WatsonMachineLearningAPIClient(wml_credentials)
+
 REEFER_CAP = 100
 RDD_WIN_PRE = 1
 RDD_WIN_AFT = 1
@@ -321,10 +329,13 @@ class VaccineOrderOptimizer(object):
     def solve(self): 
         ''' Solve the model
         '''
-        if DO_KEY == '': 
+        if DOSOLVER == 'Cloud': 
+            print("Solve optimization with IBM cloud")
+            ms = self.model.solve(log_output=self.debug)
+            # print(client.repository.ModelMetaNames.show())
+        else:
+            print("Solve optimization with DO local")
             ms = self.model.solve(log_output=self.debug, agent='local')
-        else: 
-            ms = self.model.solve(log_output=self.debug, url=DO_URL, key=DO_KEY) 
 
         if not ms:
             details = self.model.get_solve_details()
@@ -499,6 +510,7 @@ if __name__ == '__main__':
     orders = pd.read_csv(os.path.join('data', 'csv', 'TC001', 'ORDER.csv'))
     orders['RDD'] = pd.to_datetime(orders['RDD'], format='%m/%d/%Y')
     optimizer.optimize(orders)
-    optimizer.write_solution_csv(os.path.join('data', 'csv', 'TC001', 'sol'))
+    # optimizer.write_solution_csv(os.path.join('data', 'csv', 'TC001', 'sol'))
 
     print("\n  ".join(optimizer.log_msgs))
+    print(optimizer.get_sol_json())
