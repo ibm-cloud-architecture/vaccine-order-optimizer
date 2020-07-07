@@ -1,0 +1,4 @@
+Order ID,Supplier,Departure Date,Delivery Date,Qty,Cost
+VO001,"Beerse, Belgium",2020-07-10,2020-07-12,100,30.0
+VO001,"Titusville, N.J.",2020-07-10,2020-07-12,200,46.0
+VO002,"Beerse, Belgium",2020-07-09,2020-07-11,600,86.0

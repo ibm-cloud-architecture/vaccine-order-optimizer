@@ -1,0 +1,8 @@
+Type,From,Departure Date,To,Arrival Date,Qty,Reefers,Cost
+Delivery,"Beerse, Belgium",2020-07-09,"London, England",2020-07-11,600,6,86
+Delivery,"Beerse, Belgium",2020-07-10,"Paris, France",2020-07-12,100,1,30
+Delivery,"Titusville, N.J.",2020-07-10,"Paris, France",2020-07-12,200,2,46
+Reposition,"London, England",2020-07-08,"Titusville, N.J.",2020-07-10,0,2,22
+Reposition,"Paris, France",2020-07-08,"Beerse, Belgium",2020-07-09,0,2,20
+Reposition,"Paris, France",2020-07-09,"Beerse, Belgium",2020-07-10,0,1,15
+Reposition,"Titusville, N.J.",2020-07-08,"Beerse, Belgium",2020-07-09,0,2,20

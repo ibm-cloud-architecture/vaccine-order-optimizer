@@ -57,7 +57,7 @@ class VaccineOrderOptimizer(object):
         self.data['REEFER'] = pd.read_excel(fname, 'REEFER')
         self.data['INVENTORY'] = pd.read_excel(fname, 'INVENTORY')
         self.data['TRANSPORTATION'] = pd.read_excel(fname, 'TRANSPORTATION')
-        self.data['ORDER'] = pd.read_excel(fname, 'ORDER')
+        # self.data['ORDER'] = pd.read_excel(fname, 'ORDER')
 
         self.process_data()
         
@@ -70,6 +70,17 @@ class VaccineOrderOptimizer(object):
         if self.debug: 
             print(f"Load data from csv files from: {dir}")
         self.log_msgs.append(f"Load data from csv files from: {dir}")
+
+        self.data['REEFER'] = pd.read_csv(os.path.join(dir, "REEFER.csv"))
+        self.data['REEFER']['DATE_AVAILABLE'] = pd.to_datetime(self.data['REEFER']['DATE_AVAILABLE'], format='%m/%d/%Y')
+
+        self.data['INVENTORY'] = pd.read_csv(os.path.join(dir, "INVENTORY.csv"))
+        self.data['INVENTORY']['DATE_AVAILABLE'] = pd.to_datetime(self.data['INVENTORY']['DATE_AVAILABLE'], format='%m/%d/%Y')
+
+        self.data['TRANSPORTATION'] = pd.read_csv(os.path.join(dir, "TRANSPORTATION.csv"))
+        # self.data['ORDER'] = pd.read_csv(os.path.join(dir, "ORDER.csv"))
+
+        self.process_data()
 
     def process_data(self): 
         ''' Process & Verify Data
@@ -404,10 +415,30 @@ class VaccineOrderOptimizer(object):
         self.plan_shipments = pd.DataFrame(rec_shipments, columns=['Type', 'From', 'Departure Date', 'To', 'Arrival Date', 'Qty', 'Reefers', 'Cost'])
         self.plan_shipments.sort_values(['Type', 'From', 'Departure Date', 'To'], inplace=True)
 
+        sol_combo = {}
+        for a, v in self.sol_x.items(): 
+            sol_combo[a] = [v, 0, 0]
+        for a, v in self.sol_y.items(): 
+            if a not in sol_combo: 
+                sol_combo[a] = [0, v, 0]
+            else:
+                sol_combo[a][1] = v
+        for a, v in self.sol_z.items(): 
+            if a not in sol_combo: 
+                sol_combo[a] = [0, 0, v]
+            else:
+                sol_combo[a][2] = v
+
+        sol_rec = [[a[0][0], self.get_date(a[0][1]), a[1][0], self.get_date(a[1][1]), v[0], v[1], v[2], "Y" if a[0][0]==a[1][0] else "N"] + self.get_arc_info(a) for a,v in sol_combo.items()]
+        self.sol_combo = pd.DataFrame(sol_rec, columns=['FROM_LOC', 'FROM_DATE', 'TO_LOC', 'TO_DATE', 'X', 'Y', 'Z', 
+                                                'INTRA', 'ARC_FIX_COST', 'ARC_REEFER_COST', 'ORDER_QTY', 'VACCINE SUPPLY', 'REEFER SUPPLY'])
+        self.sol_combo.sort_values(['FROM_DATE', 'FROM_LOC', 'TO_DATE', 'TO_LOC'], inplace=True)
+
         if self.debug: 
             print(self.plan_orders)
             print(self.plan_order_details)
             print(self.plan_shipments)
+            print(self.sol_combo)
 
     def get_cost(self, a, reefers): 
         ''' Assess the transportation cost for the given number of reefers on an arc
@@ -436,43 +467,38 @@ class VaccineOrderOptimizer(object):
     def write_solution(self, fname): 
         ''' Write solution to an Excel file
         '''
-        sol = {}
-        for a, v in self.sol_x.items(): 
-            if a not in sol: 
-                sol[a] = [v, 0, 0]
-            else:
-                sol[a][0] = v
-        for a, v in self.sol_y.items(): 
-            if a not in sol: 
-                sol[a] = [0, v, 0]
-            else:
-                sol[a][1] = v
-        for a, v in self.sol_z.items(): 
-            if a not in sol: 
-                sol[a] = [0, 0, v]
-            else:
-                sol[a][2] = v
-
-        sol_rec = [[a[0][0], self.get_date(a[0][1]), a[1][0], self.get_date(a[1][1]), v[0], v[1], v[2], "Y" if a[0][0]==a[1][0] else "N"] + self.get_arc_info(a) for a,v in sol.items()]
-        sol_df = pd.DataFrame(sol_rec, columns=['FROM_LOC', 'FROM_DATE', 'TO_LOC', 'TO_DATE', 'X', 'Y', 'Z', 
-                                                'INTRA', 'ARC_FIX_COST', 'ARC_REEFER_COST', 'ORDER_QTY', 'VACCINE SUPPLY', 'REEFER SUPPLY'])
-        sol_df.sort_values(['FROM_DATE', 'FROM_LOC', 'TO_DATE', 'TO_LOC'], inplace=True)
-        
         with pd.ExcelWriter(os.path.join('data', 'excel', 'sol', fname)) as writer: 
             self.plan_orders.to_excel(writer,'Orders', index=False)
             self.plan_order_details.to_excel(writer,'Order Details', index=False)
             self.plan_shipments.to_excel(writer,'Shipments', index=False)
-            sol_df.to_excel(writer,'SOL_COMBO', index=False)
+            self.sol_combo.to_excel(writer,'SOL_COMBO', index=False)
             writer.save()
+
+    def write_solution_csv(self, dir): 
+        ''' Write solution to csv files
+        '''
+        self.plan_orders.to_csv(os.path.join(dir, 'Orders.csv'), index=False)
+        self.plan_order_details.to_csv(os.path.join(dir, 'Order Details.csv'), index=False)
+        self.plan_shipments.to_csv(os.path.join(dir, 'Shipments.csv'), index=False)
+        self.sol_combo.to_csv(os.path.join(dir, 'SOL_COMBO.csv'), index=False)
+
+    def get_sol_json(self): 
+        return {"Orders":self.plan_orders.to_json(orient='records', date_format='iso'), 
+                 "OrderDetails":self.plan_order_details.to_json(orient='records', date_format='iso'),
+                 "Shipments":self.plan_shipments.to_json(orient='records', date_format='iso')}
 
 if __name__ == '__main__':
     optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
 
-    # optimizer.load_data_csv("TC001")
-    optimizer.load_data_excel("TC001")
-    
-    orders = pd.read_excel(os.path.join('data', 'excel', f'TC001.xlsx'), 'ORDER')
-    optimizer.optimize(orders)
+    # optimizer.load_data_excel("TC001")
+    # orders = pd.read_excel(os.path.join('data', 'excel', f'TC001.xlsx'), 'ORDER')
+    # optimizer.optimize(orders)
+    # optimizer.write_solution("TC001_Sol.xlsx")
 
-    optimizer.write_solution("TC001_Sol.xlsx")
+    optimizer.load_data_csv("TC001")
+    orders = pd.read_csv(os.path.join('data', 'csv', 'TC001', 'ORDER.csv'))
+    orders['RDD'] = pd.to_datetime(orders['RDD'], format='%m/%d/%Y')
+    optimizer.optimize(orders)
+    optimizer.write_solution_csv(os.path.join('data', 'csv', 'TC001', 'sol'))
+
     print("\n  ".join(optimizer.log_msgs))

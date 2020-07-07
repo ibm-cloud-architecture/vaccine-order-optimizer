@@ -1,0 +1,15 @@
+LANE_ID,FROM_LOC,TO_LOC,TRANSIT_TIME,REEFER_COST,FIXED_COST
+1,"Beerse, Belgium","Paris, France",2,10,20
+2,"Titusville, N.J.","London, England",2,12,20
+3,"Beerse, Belgium","London, England",2,11,20
+4,"Titusville, N.J.","Paris, France",2,13,20
+5,"Paris, France","Beerse, Belgium",1,6,10
+6,"London, England","Titusville, N.J.",2,6,10
+7,"Paris, France","Beerse, Belgium",1,5,10
+8,"London, England","Titusville, N.J.",2,6,10
+9,"Beerse, Belgium","Titusville, N.J.",1,5,10
+10,"Titusville, N.J.","Beerse, Belgium",1,5,10
+11,"Paris, France","Paris, France",1,2,0
+12,"London, England","London, England",1,2,0
+13,"Beerse, Belgium","Beerse, Belgium",1,1,0
+14,"Titusville, N.J.","Titusville, N.J.",1,1,0

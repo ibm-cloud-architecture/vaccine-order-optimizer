@@ -1,0 +1,3 @@
+Order ID,Destination,Order Qty,Order Priority,Order RDD,First Delivery,Last Delivery,Number of Deliveries,Delivered Qty,Remaining Qty
+VO001,"Paris, France",300,10,2020-07-12,2020-07-12,2020-07-12,1,300,0
+VO002,"London, England",600,5,2020-07-11,2020-07-11,2020-07-11,1,600,0

@@ -1,0 +1,11 @@
+REEFER_ID,STATUS,LOCATION,DATE_AVAILABLE
+RC00001,Ready,"Beerse, Belgium",
+RC00002,Ready,"Beerse, Belgium",
+RC00003,Ready,"Titusville, N.J.",
+RC00004,Ready,"Titusville, N.J.",
+RC00005,In-Transit,"Paris, France",7/7/2020
+RC00006,In-Transit,"Paris, France",7/8/2020
+RC00007,In-Transit,"Paris, France",7/9/2020
+RC00008,In-Transit,"London, England",7/7/2020
+RC00009,In-Transit,"London, England",7/8/2020
+RC00010,In-Transit,"London, England",7/9/2020
