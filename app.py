@@ -1,3 +1,4 @@
+# 
 # Import modules
 from doaf_vaccine_order_optimizer import VaccineOrderOptimizer
 from flask import Flask, request
@@ -18,9 +19,9 @@ def optimize():
     optimizer.load_data_csv("TC001")
 
     # Read json and convert to orders dataframe
-    orders = pd.DataFrame(request.get_json(force=True))
-    orders['RDD'] = pd.to_datetime(orders['RDD'], format='%m/%d/%Y')
-    optimizer.optimize(orders)
+    order = pd.DataFrame(request.get_json(force=True))
+    order['RDD'] = pd.to_datetime(order['RDD'], format='%m/%d/%Y')
+    optimizer.optimize(order)
     
     # post optimiztion
     print("\n  ".join(optimizer.log_msgs))
