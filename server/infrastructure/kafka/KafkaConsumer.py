@@ -1,50 +1,64 @@
-import json,os
+import json
 from confluent_kafka import Consumer, KafkaError
 
 
 class KafkaConsumer:
 
-    def __init__(self,
-                kafka_brokers = "", 
-                kafka_user = "", 
-                kafka_pwd = "", 
-                kafka_cacert = "", 
-                topic_name = "", 
-                autocommit = True,
-                fromWhere = 'earliest'):
+    def __init__(self, kafka_env = 'LOCAL', kafka_brokers = "", kafka_user = "", kafka_password = "", sslCertificate = "", topic_name = "", fromWhere = "earliest", autocommit = False):
+        self.kafka_env = kafka_env
         self.kafka_brokers = kafka_brokers
-        self.kafka_apikey = kafka_apikey
-        self.kafka_cacert = kafka_cacert
+        self.kafka_user = kafka_user
+        self.kafka_password = kafka_password
         self.topic_name = topic_name
-        self.fromWhere = fromWhere
         self.kafka_auto_commit = autocommit
-        prepare()
+        self.kafka_from_where = fromWhere
+        self.kafka_ssl_certificate = sslCertificate
 
-    def prepare(self, groupID = "pythonconsumers"):
+    # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+    # Prepares de Consumer with specific options based on the case
+    def prepareConsumer(self, groupID = "KafkaConsumer"):
         options ={
                 'bootstrap.servers':  self.kafka_brokers,
                 'group.id': groupID,
-                 'auto.offset.reset': self.fromWhere,
+                'auto.offset.reset': self.kafka_from_where,
                 'enable.auto.commit': self.kafka_auto_commit,
         }
-        if (self.kafka_apikey != ''):
+        if (self.kafka_env != 'LOCAL'):
             options['security.protocol'] = 'SASL_SSL'
             options['sasl.mechanisms'] = 'PLAIN'
-            options['sasl.username'] = 'token'
-            options['sasl.password'] = self.kafka_apikey
-        if (self.kafka_cacert != ''):
-            options['ssl.ca.location'] = self.kafka_cacert
+            options['sasl.username'] = self.kafka_user
+            options['sasl.password'] = self.kafka_password
+        if (self.kafka_env == 'OCP'):
+            options['sasl.mechanisms'] = 'SCRAM-SHA-512'
+            options['ssl.ca.location'] = self.kafka_ssl_certificate
+
+        # Printing out producer config for debugging purposes        
         print("[KafkaConsumer] - This is the configuration for the consumer:")
-        print('[KafkaConsumer] - {}'.format(options))
+        print("[KafkaConsumer] - -------------------------------------------")
+        print('[KafkaConsumer] - Bootstrap Server:  {}'.format(options['bootstrap.servers']))
+        if (self.kafka_env != 'LOCAL'):
+            # Obfuscate password
+            if (len(self.kafka_password) > 3):
+                obfuscated_password = self.kafka_password[0] + "*****" + self.kafka_password[len(self.kafka_password)-1]
+            else:
+                obfuscated_password = "*******"
+            print('[KafkaConsumer] - Security Protocol: {}'.format(options['security.protocol']))
+            print('[KafkaConsumer] - SASL Mechanism:    {}'.format(options['sasl.mechanisms']))
+            print('[KafkaConsumer] - SASL Username:     {}'.format(options['sasl.username']))
+            print('[KafkaConsumer] - SASL Password:     {}'.format(obfuscated_password))
+            if (self.kafka_env == 'OCP'): 
+                print('[KafkaConsumer] - SSL CA Location:   {}'.format(options['ssl.ca.location']))
+        print("[KafkaConsumer] - -------------------------------------------")
+
+        # Create the consumer
         self.consumer = Consumer(options)
         self.consumer.subscribe([self.topic_name])
     
     # Prints out and returns the decoded events received by the consumer
     def traceResponse(self, msg):
         msgStr = msg.value().decode('utf-8')
-        print(msgStr)
-        print('[KafkaConsumer] - @@@ pollNextRecord {} partition: [{}] at offset {} with key {}:\n\tvalue: {}'
-                    .format(msg.topic(), msg.partition(), msg.offset(), str(msg.key()), msgStr ))
+        print('[KafkaConsumer] - Topic {} partition [{}] at offset {}:\n\tkey {}:\n\tvalue: {}'
+                    .format(msg.topic(), msg.partition(), msg.offset(), msg.key().decode('utf-8'), msgStr ))
         return msgStr
 
     # Polls for events until it finds an event where keyId=keyname
@@ -95,6 +109,38 @@ class KafkaConsumer:
             if (str(msg.key().decode('utf-8')) == keyID):
                 gotIt = True
         return anEvent
+
+    # Polls for the next event
+    def pollNextEvent(self):
+        anEvent = {}
+        msg = self.consumer.poll(timeout=10.0)
+        if msg is None:
+            return None
+        if msg.error():
+            # Stop reading if we find end of partition in the error message
+            if ("PARTITION_EOF" in msg.error()):
+                return None
+            else:
+                print("[KafkaConsumer] - Consumer error: {}".format(msg.error()))
+                return None
+        msgStr = self.traceResponse(msg)
+        # Create the json event based on message string formed by traceResponse
+        anEvent = json.loads(msgStr)
+        return anEvent
+    
+    # Polls for the next event but returns the raw event
+    def pollNextRawEvent(self):
+        msg = self.consumer.poll(timeout=10.0)
+        if msg is None:
+            return None
+        if msg.error():
+            # Stop reading if we find end of partition in the error message
+            if ("PARTITION_EOF" in msg.error()):
+                return None
+            else:
+                print("[KafkaConsumer] - Consumer error: {}".format(msg.error()))
+                return None
+        return msg
 
     # Polls for events endlessly
     def pollEvents(self):

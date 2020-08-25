@@ -4,8 +4,9 @@ import logging
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.routes.prometheus import track_requests
-from server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
+from userapp.server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
 from flask import current_app as app
+from userapp.server__init__ import container_consumer
 """
  created a new instance of the Blueprint class and bound the Controller resource to it.
 """
@@ -27,6 +28,10 @@ class OrderShipmentController(Resource):
     @track_requests
     @swag_from('controlapi.yml')
     def post(self):
+        print('XXXXXXXXXXXXXXXXXXXXXXXX')
+        containers = container_consumer.getContainers()
+        print(*containers, sep = "\n")
+        return containers,202
         app.logger.info("post order received: ")
         order = request.get_json(force=True)
         app.logger.info(order)

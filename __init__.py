@@ -8,6 +8,7 @@ from datetime import datetime
 from server import app
 
 from userapp.server.api.controller import control_blueprint
+from userapp.server.infrastructure.ContainerConsumer import ContainerConsumer
 
 
 # The python-flask stack includes the flask extension flasgger, which will build
@@ -34,8 +35,18 @@ swagger_template = {
 app.register_blueprint(control_blueprint)
 swagger = Swagger(app, template=swagger_template)
 
+container_consumer = ContainerConsumer()
+container_consumer.startProcessing()
+
 # It is considered bad form to return an error for '/', so let's redirect to the apidocs
 @app.route('/')
 def index():
     return redirect('/apidocs')
+
+@app.route('/test')
+def getContainers():
+  print('Rest call for returning containers')
+  containers = container_consumer.getContainers()
+  print(*containers, sep = "\n")
+  return containers,202
 

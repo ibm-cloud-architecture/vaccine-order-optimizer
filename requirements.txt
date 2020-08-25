@@ -1,5 +1,0 @@
-flask==1.1.1
-pandas==0.25.3
-flasgger==0.9.3
-numpy==1.17.4
-docplex
