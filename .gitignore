@@ -1,4 +1,5 @@
-scripts/setenv.sh 
+scripts/setenv.sh
+scripts/appsody.env
 scripts/kafka.properties
 # Byte-compiled / optimized / DLL files
 __pycache__/

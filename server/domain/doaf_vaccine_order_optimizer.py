@@ -140,7 +140,7 @@ class VaccineOrderOptimizer(object):
                 self.customer_locs.add(to_loc)
             self.lanes[(from_loc, to_loc)] = Lane(rec['LANE_ID'], from_loc, to_loc, int(rec['TRANSIT_TIME']), rec['REEFER_COST'], rec['FIXED_COST'])
 
-    def optimize(self, orders): 
+    def optimize(self, orders, reefer, inventory, transportation): 
         ''' Optimize for a list of orders
         '''
         self.orders = {}

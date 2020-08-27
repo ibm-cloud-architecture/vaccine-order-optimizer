@@ -6,7 +6,7 @@ from flask_restful import Resource, Api
 from server.routes.prometheus import track_requests
 from userapp.server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
 from flask import current_app as app
-from userapp.server__init__ import container_consumer
+from userapp import reefer_consumer, inventory_consumer, transportation_consumer
 """
  created a new instance of the Blueprint class and bound the Controller resource to it.
 """
@@ -17,7 +17,8 @@ api = Api(control_blueprint)
 # The python-flask stack includes the prometheus metrics engine. You can ensure your endpoints
 # are included in these metrics by enclosing them in the @track_requests wrapper.
 
-class OrderShipmentController(Resource):
+class OrderShipmentController(Resource):  
+
     def get(self):
         return {"status": "success", "message": "present "}
     
@@ -28,10 +29,6 @@ class OrderShipmentController(Resource):
     @track_requests
     @swag_from('controlapi.yml')
     def post(self):
-        print('XXXXXXXXXXXXXXXXXXXXXXXX')
-        containers = container_consumer.getContainers()
-        print(*containers, sep = "\n")
-        return containers,202
         app.logger.info("post order received: ")
         order = request.get_json(force=True)
         app.logger.info(order)
@@ -39,6 +36,7 @@ class OrderShipmentController(Resource):
         # prepare the data add the order to existing orders
         optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
         # call: optimizer.optimize(orders)
+        # New call: optimizer.optimize(orders,reefer_consumer.getEvents(), inventory_consumer.getEvents(), transportation_consumer.getEvents())
 
         if not 'containerID' in order:
             abort(400) 

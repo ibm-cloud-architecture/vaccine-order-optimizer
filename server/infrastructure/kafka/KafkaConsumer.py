@@ -1,52 +1,54 @@
-import json
+import json, os
 from confluent_kafka import Consumer, KafkaError
+import userapp.server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 
 
 class KafkaConsumer:
 
-    def __init__(self, kafka_env = 'LOCAL', kafka_brokers = "", kafka_user = "", kafka_password = "", sslCertificate = "", topic_name = "", fromWhere = "earliest", autocommit = False):
-        self.kafka_env = kafka_env
-        self.kafka_brokers = kafka_brokers
-        self.kafka_user = kafka_user
-        self.kafka_password = kafka_password
+    def __init__(self, topic_name = ""):
         self.topic_name = topic_name
-        self.kafka_auto_commit = autocommit
-        self.kafka_from_where = fromWhere
-        self.kafka_ssl_certificate = sslCertificate
 
     # See https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
     # Prepares de Consumer with specific options based on the case
-    def prepareConsumer(self, groupID = "KafkaConsumer"):
+    def prepareConsumer(self, groupID = "VOOKafkaConsumer"):
         options ={
-                'bootstrap.servers':  self.kafka_brokers,
+                'bootstrap.servers': EventBackboneConfig.getKafkaBrokers(),
                 'group.id': groupID,
-                'auto.offset.reset': self.kafka_from_where,
-                'enable.auto.commit': self.kafka_auto_commit,
+                'auto.offset.reset': 'earliest',
+                'enable.auto.commit': False,
         }
-        if (self.kafka_env != 'LOCAL'):
+        if (EventBackboneConfig.needsAuthentication()):
+            # Set security protocol common to ES on prem and on IBM Cloud
             options['security.protocol'] = 'SASL_SSL'
-            options['sasl.mechanisms'] = 'PLAIN'
-            options['sasl.username'] = self.kafka_user
-            options['sasl.password'] = self.kafka_password
-        if (self.kafka_env == 'OCP'):
-            options['sasl.mechanisms'] = 'SCRAM-SHA-512'
-            options['ssl.ca.location'] = self.kafka_ssl_certificate
+            # Depending on the Kafka User, we will know whether we are talking to ES on prem or on IBM Cloud
+            # If we are connecting to ES on IBM Cloud, the SASL mechanism is plain
+            if (EventBackboneConfig.getKafkaUser() == 'token'):
+                options['sasl.mechanisms'] = 'PLAIN'
+            # If we are connecting to ES on OCP, the SASL mechanism is scram-sha-512
+            else:
+                options['sasl.mechanisms'] = 'SCRAM-SHA-512'
+            # Set the SASL username and password
+            options['sasl.username'] = EventBackboneConfig.getKafkaUser()
+            options['sasl.password'] = EventBackboneConfig.getKafkaPassword()
+        # If we are talking to ES on prem, it uses an SSL certificate to establish communication
+        if (EventBackboneConfig.isCertificateSecured()):
+            options['ssl.ca.location'] = EventBackboneConfig.getKafkaCertificate()
 
         # Printing out producer config for debugging purposes        
         print("[KafkaConsumer] - This is the configuration for the consumer:")
         print("[KafkaConsumer] - -------------------------------------------")
         print('[KafkaConsumer] - Bootstrap Server:  {}'.format(options['bootstrap.servers']))
-        if (self.kafka_env != 'LOCAL'):
+        if (EventBackboneConfig.needsAuthentication()):
             # Obfuscate password
-            if (len(self.kafka_password) > 3):
-                obfuscated_password = self.kafka_password[0] + "*****" + self.kafka_password[len(self.kafka_password)-1]
+            if (len(EventBackboneConfig.getKafkaPassword()) > 3):
+                obfuscated_password = EventBackboneConfig.getKafkaPassword()[0] + "*****" + EventBackboneConfig.getKafkaPassword()[len(EventBackboneConfig.getKafkaPassword())-1]
             else:
                 obfuscated_password = "*******"
             print('[KafkaConsumer] - Security Protocol: {}'.format(options['security.protocol']))
             print('[KafkaConsumer] - SASL Mechanism:    {}'.format(options['sasl.mechanisms']))
             print('[KafkaConsumer] - SASL Username:     {}'.format(options['sasl.username']))
             print('[KafkaConsumer] - SASL Password:     {}'.format(obfuscated_password))
-            if (self.kafka_env == 'OCP'): 
+            if (EventBackboneConfig.isCertificateSecured()): 
                 print('[KafkaConsumer] - SSL CA Location:   {}'.format(options['ssl.ca.location']))
         print("[KafkaConsumer] - -------------------------------------------")
 
