@@ -1,0 +1,96 @@
+apiVersion: appsody.dev/v1beta1
+kind: AppsodyApplication
+metadata:
+  annotations:
+    commit.image.appsody.dev/date: Thu Aug 27 16:05:33 2020 +0200
+    commit.image.appsody.dev/message: second drop
+    commit.stack.appsody.dev/contextDir: /incubator/python-flask
+    commit.stack.appsody.dev/date: Tue Jun 16 13:12:10 2020 +0100
+    commit.stack.appsody.dev/message: 'python-flask: Avoid permission errors when
+      building dependencies (#834)'
+    image.opencontainers.org/created: "2020-08-27T16:32:57+02:00"
+    image.opencontainers.org/documentation: https://github.com/jesusmah/vaccine-order-optimizer
+    image.opencontainers.org/revision: a9f47e39945d04e9994638892b2d8f93007edb3b-modified
+    image.opencontainers.org/source: https://github.com/jesusmah/vaccine-order-optimizer/tree/master
+    image.opencontainers.org/url: https://github.com/jesusmah/vaccine-order-optimizer
+    stack.appsody.dev/authors: Chris Bailey <seabaylea>, Henry Nash <henrynash>
+    stack.appsody.dev/configured: docker.io/appsody/python-flask:latest
+    stack.appsody.dev/created: "2020-06-16T12:14:33Z"
+    stack.appsody.dev/description: Flask web Framework for Python
+    stack.appsody.dev/digest: sha256:2113962fbbb33dd895cdfc878a501b65799737e4dbe688dc9da0de9c7c050218
+    stack.appsody.dev/documentation: https://github.com/appsody/stacks/tree/master/incubator/python-flask/README.md
+    stack.appsody.dev/licenses: Apache-2.0
+    stack.appsody.dev/revision: fe8e2b8701074199dcf3ecb549ff2a40f7611d8c
+    stack.appsody.dev/source: https://github.com/appsody/stacks/tree/master/incubator/python-flask/image
+    stack.appsody.dev/tag: docker.io/appsody/python-flask:0.2.4
+    stack.appsody.dev/title: Python Flask
+    stack.appsody.dev/url: https://github.com/appsody/stacks/tree/master/incubator/python-flask
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/part-of: covid19-vaccine
+    image.opencontainers.org/title: vaccine-order-optimizer
+    stack.appsody.dev/id: python-flask
+    stack.appsody.dev/version: 0.2.4
+  name: vaccine-order-optimizer
+spec:
+  applicationImage: ibmcase/vaccine-order-optimizer:latest
+  createKnativeService: false
+  env:
+  - name: KAFKA_BROKERS
+    valueFrom:
+      configMapKeyRef:
+        key: brokers
+        name: kafka-brokers
+  - name: REEFER_TOPIC
+    valueFrom:
+      configMapKeyRef:
+        key: reeferTopic
+        name: vaccine-kafka-topics
+  - name: INVENTORY_TOPIC
+    valueFrom:
+      configMapKeyRef:
+        key: inventoryTopic
+        name: vaccine-kafka-topics
+  - name: TRANSPORTATION_TOPIC
+    valueFrom:
+      configMapKeyRef:
+        key: transportationTopic
+        name: vaccine-kafka-topics
+  - name: KAFKA_USER
+    valueFrom:
+      secretKeyRef:
+        name: "eventstreams-cred"
+        key: username
+  - name: KAFKA_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: "eventstreams-cred"
+        key: password
+  - name: KAFKA_CERT
+    value: /certs/es-cert.pem
+  volumeMounts:
+  - mountPath: /certs
+    name: eventstreams-cert-pem
+  volumes:
+  - name: eventstreams-cert-pem
+    secret:
+      secretName: eventstreams-cert-pem
+  expose: true
+  livenessProbe:
+    failureThreshold: 12
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 2
+  monitoring:
+    labels:
+      k8s-app: vaccine-order-optimizer
+  service:
+    annotations:
+      prometheus.io/scrape: "true"
+    port: 8080
+    type: NodePort
+  pullPolicy: Always
+  stack: python-flask
+  version: 1.0.0

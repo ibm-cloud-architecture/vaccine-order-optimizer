@@ -1,4 +1,4 @@
 id: "20200611142812.44227300"
-application-name: vaccine-order-optimizer
+application-name: covid19-vaccine
 project-name: vaccine-order-optimizer
 stack: docker.io/appsody/python-flask:latest
