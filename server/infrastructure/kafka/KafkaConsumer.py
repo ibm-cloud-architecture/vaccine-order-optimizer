@@ -34,7 +34,7 @@ class KafkaConsumer:
         if (EventBackboneConfig.isCertificateSecured()):
             options['ssl.ca.location'] = EventBackboneConfig.getKafkaCertificate()
 
-        # Printing out producer config for debugging purposes        
+        # Printing out consumer config for debugging purposes        
         print("[KafkaConsumer] - This is the configuration for the consumer:")
         print("[KafkaConsumer] - -------------------------------------------")
         print('[KafkaConsumer] - Bootstrap Server:  {}'.format(options['bootstrap.servers']))
@@ -132,7 +132,7 @@ class KafkaConsumer:
     
     # Polls for the next event but returns the raw event
     def pollNextRawEvent(self):
-        msg = self.consumer.poll(timeout=10.0)
+        msg = self.consumer.poll(timeout=5.0)
         if msg is None:
             return None
         if msg.error():

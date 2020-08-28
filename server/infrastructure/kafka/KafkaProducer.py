@@ -1,42 +1,51 @@
-import time 
+import time, json, datetime, logging, os
 from confluent_kafka import KafkaError, Producer
-import json, datetime, logging
-import os
+import userapp.server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 
 class KafkaProducer:
 
-    def __init__(self,
-                kafka_brokers = "", 
-                kafka_user = "", 
-                kafka_pwd = "", 
-                kafka_cacert = "", 
-                kafka_sasl_mechanism = "", 
-                topic_name = ""):
-        self.kafka_brokers = kafka_brokers
-        self.kafka_user = kafka_user
-        self.kafka_pwd = kafka_pwd
-        self.kafka_sasl_mechanism = kafka_sasl_mechanism
-        self.kafka_cacert = kafka_cacert
-        self.topic_name = topic_name
-
-    def prepare(self,groupID = "pythonproducers"):
+    def prepareProducer(self,groupID = "VaccineDataProducer"):
         options ={
-                'bootstrap.servers':  self.kafka_brokers,
+                'bootstrap.servers': EventBackboneConfig.getKafkaBrokers(),
                 'group.id': groupID,
                 'delivery.timeout.ms': 15000,
                 'request.timeout.ms' : 15000
         }
-        options['security.protocol'] = 'SASL_SSL'
-        options['sasl.mechanisms'] = self.kafka_sasl_mechanism
-        options['sasl.username'] = self.kafka_user
-        options['sasl.password'] = self.kafka_pwd
-        
-        if (self.kafka_cacert != '' ):
-            options['ssl.ca.location'] = self.kafka_cacert
+        if (EventBackboneConfig.needsAuthentication()):
+            # Set security protocol common to ES on prem and on IBM Cloud
+            options['security.protocol'] = 'SASL_SSL'
+            # Depending on the Kafka User, we will know whether we are talking to ES on prem or on IBM Cloud
+            # If we are connecting to ES on IBM Cloud, the SASL mechanism is plain
+            if (EventBackboneConfig.getKafkaUser() == 'token'):
+                options['sasl.mechanisms'] = 'PLAIN'
+            # If we are connecting to ES on OCP, the SASL mechanism is scram-sha-512
+            else:
+                options['sasl.mechanisms'] = 'SCRAM-SHA-512'
+            # Set the SASL username and password
+            options['sasl.username'] = EventBackboneConfig.getKafkaUser()
+            options['sasl.password'] = EventBackboneConfig.getKafkaPassword()
+        # If we are talking to ES on prem, it uses an SSL certificate to establish communication
+        if (EventBackboneConfig.isCertificateSecured()):
+            options['ssl.ca.location'] = EventBackboneConfig.getKafkaCertificate()
 
-        logging.info("--- This is the configuration for the producer: ---")
-        logging.info('[KafkaProducer] - {}'.format(options))
-        logging.info("---------------------------------------------------")
+        # Printing out producer config for debugging purposes        
+        print("[KafkaProducer] - This is the configuration for the producer:")
+        print("[KafkaProducer] - -------------------------------------------")
+        print('[KafkaProducer] - Bootstrap Server:  {}'.format(options['bootstrap.servers']))
+        if (EventBackboneConfig.needsAuthentication()):
+            # Obfuscate password
+            if (len(EventBackboneConfig.getKafkaPassword()) > 3):
+                obfuscated_password = EventBackboneConfig.getKafkaPassword()[0] + "*****" + EventBackboneConfig.getKafkaPassword()[len(EventBackboneConfig.getKafkaPassword())-1]
+            else:
+                obfuscated_password = "*******"
+            print('[KafkaProducer] - Security Protocol: {}'.format(options['security.protocol']))
+            print('[KafkaProducer] - SASL Mechanism:    {}'.format(options['sasl.mechanisms']))
+            print('[KafkaProducer] - SASL Username:     {}'.format(options['sasl.username']))
+            print('[KafkaProducer] - SASL Password:     {}'.format(obfuscated_password))
+            if (EventBackboneConfig.isCertificateSecured()): 
+                print('[KafkaProducer] - SSL CA Location:   {}'.format(options['ssl.ca.location']))
+        print("[KafkaProducer] - -------------------------------------------")
+
         self.producer = Producer(options)
 
 
@@ -44,15 +53,15 @@ class KafkaProducer:
         """ Called once for each message produced to indicate delivery result.
             Triggered by poll() or flush(). """
         if err is not None:
-            logging.info( str(datetime.datetime.today()) + ' - Message delivery failed: {}'.format(err))
+            print( str(datetime.datetime.today()) + ' - Message delivery failed: {}'.format(err))
         else:
-            logging.info(str(datetime.datetime.today()) + ' - Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+            print(str(datetime.datetime.today()) + ' - Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
 
-    def publishEvent(self, eventToSend, keyName):
+    def publishEvent(self, topic, eventToSend, keyName):
         dataStr = json.dumps(eventToSend)
-        logging.info("Send " + dataStr + " with key " + keyName + " to " + self.topic_name)
+        logging.info("Send " + dataStr + " with key " + keyName + " to " + topic)
         
-        self.producer.produce(self.topic_name,
+        self.producer.produce(topic,
                            key=str(eventToSend[keyName]).encode('utf-8'),
                            value=dataStr.encode('utf-8'),
                            callback=self.delivery_report)

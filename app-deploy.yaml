@@ -68,6 +68,14 @@ spec:
         key: password
   - name: KAFKA_CERT
     value: /certs/es-cert.pem
+  # Run python unbuffered so that you get the print() statements in the logs right away
+  - name: PYTHONUNBUFFERED
+    value: "yes"
+  # Prettify JSON objects returned
+  - name: JSONIFY_PRETTYPRINT_REGULAR
+    value: "True"
+  - name: FLASK_DEBUG
+    value: "False"
   volumeMounts:
   - mountPath: /certs
     name: eventstreams-cert-pem
