@@ -1,0 +1,24 @@
+Get Reefer data in JSON format
+---
+responses:
+    202:
+        description: Reefer data in JSON format
+        examples:
+            application-json:  {"RC00001": {
+                                    "date_available": "", 
+                                    "location": "Beerse, Belgium", 
+                                    "reefer_id": "RC00001", 
+                                    "status": "Ready"
+                                },
+                                "RC00002": {
+                                    "date_available": "", 
+                                    "location": "Beerse, Belgium", 
+                                    "reefer_id": "RC00002", 
+                                    "status": "Ready"
+                                }, 
+                                "RC00003": {
+                                    "date_available": "", 
+                                    "location": "Titusville, N.J.", 
+                                    "reefer_id": "RC00003", 
+                                    "status": "Ready"
+                                }}

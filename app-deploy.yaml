@@ -2,15 +2,15 @@ apiVersion: appsody.dev/v1beta1
 kind: AppsodyApplication
 metadata:
   annotations:
-    commit.image.appsody.dev/date: Thu Aug 27 16:05:33 2020 +0200
-    commit.image.appsody.dev/message: second drop
+    commit.image.appsody.dev/date: Fri Aug 28 21:11:47 2020 +0200
+    commit.image.appsody.dev/message: third drop
     commit.stack.appsody.dev/contextDir: /incubator/python-flask
     commit.stack.appsody.dev/date: Tue Jun 16 13:12:10 2020 +0100
     commit.stack.appsody.dev/message: 'python-flask: Avoid permission errors when
       building dependencies (#834)'
-    image.opencontainers.org/created: "2020-08-27T16:32:57+02:00"
+    image.opencontainers.org/created: "2020-08-31T18:34:59+02:00"
     image.opencontainers.org/documentation: https://github.com/jesusmah/vaccine-order-optimizer
-    image.opencontainers.org/revision: a9f47e39945d04e9994638892b2d8f93007edb3b-modified
+    image.opencontainers.org/revision: e7362eee0e7ac002d018fa253aca7c4d4fcf0d3a-modified
     image.opencontainers.org/source: https://github.com/jesusmah/vaccine-order-optimizer/tree/master
     image.opencontainers.org/url: https://github.com/jesusmah/vaccine-order-optimizer
     stack.appsody.dev/authors: Chris Bailey <seabaylea>, Henry Nash <henrynash>
@@ -59,30 +59,21 @@ spec:
   - name: KAFKA_USER
     valueFrom:
       secretKeyRef:
-        name: "eventstreams-cred"
         key: username
+        name: eventstreams-cred
   - name: KAFKA_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: "eventstreams-cred"
         key: password
+        name: eventstreams-cred
   - name: KAFKA_CERT
     value: /certs/es-cert.pem
-  # Run python unbuffered so that you get the print() statements in the logs right away
   - name: PYTHONUNBUFFERED
     value: "yes"
-  # Prettify JSON objects returned
   - name: JSONIFY_PRETTYPRINT_REGULAR
     value: "True"
   - name: FLASK_DEBUG
     value: "False"
-  volumeMounts:
-  - mountPath: /certs
-    name: eventstreams-cert-pem
-  volumes:
-  - name: eventstreams-cert-pem
-    secret:
-      secretName: eventstreams-cert-pem
   expose: true
   livenessProbe:
     failureThreshold: 12
@@ -94,11 +85,18 @@ spec:
   monitoring:
     labels:
       k8s-app: vaccine-order-optimizer
+  pullPolicy: Always
   service:
     annotations:
       prometheus.io/scrape: "true"
     port: 8080
     type: NodePort
-  pullPolicy: Always
   stack: python-flask
   version: 1.0.0
+  volumeMounts:
+  - mountPath: /certs
+    name: eventstreams-cert-pem
+  volumes:
+  - name: eventstreams-cert-pem
+    secret:
+      secretName: eventstreams-cert-pem

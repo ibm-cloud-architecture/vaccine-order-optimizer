@@ -5,7 +5,6 @@ from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.routes.prometheus import track_requests
 from userapp.server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
-from flask import current_app as app
 from userapp import reefer_consumer, inventory_consumer, transportation_consumer, orders
 """
  created a new instance of the Blueprint class and bound the OrderShipmentController resource to it.
@@ -37,12 +36,12 @@ class OrderShipmentController(Resource):
         orders.processOrder(order_json)
         # #####optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
         # call: optimizer.optimize(orders)
-        # New call: optimizer.optimize(orders,reefer_consumer.getEvents(), inventory_consumer.getEvents(), transportation_consumer.getEvents())
+        # New call: optimizer.optimize(orders.getOrdersPanda(),reefer_consumer.getEventsPanda(), inventory_consumer.getEventsPanda(), transportation_consumer.getEventsPanda())
 
         # if not 'containerID' in order:
         #     abort(400) 
-        return { "reason": "New order processed"},202
+        return "New order processed!",202
     
 
 
-api.add_resource(OrderShipmentController, "/voro/api/v1/")
+api.add_resource(OrderShipmentController, "/api/v1/new-order")

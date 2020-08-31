@@ -1,0 +1,12 @@
+Get Inventory data in Pandas format
+---
+responses:
+    202:
+        description: Inventory data in Pandas format
+        examples:
+            text/plaintext: |
+                . lot_id  qty          location date_available
+                0  L0001  200   Beerse, Belgium               
+                1  L0002  200   Beerse, Belgium       7/8/2020
+                2  L0003  200   Beerse, Belgium       7/9/2020
+                3  L0004  200  Titusville, N.J.      7/10/2020
