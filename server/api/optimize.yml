@@ -1,0 +1,22 @@
+Optimize Vaccine Order Delivery
+---
+responses:
+    202:
+        description: Vaccine Order Delivery optimization successfully ran
+        examples:
+            text/plaintext: |
+                Orders
+                ------------------
+                  Order ID    Destination  Order Qty  Order Priority   Order RDD First Delivery Last Delivery  Number of Deliveries  Delivered Qty  Remaining Qty
+                0    VO001  Paris, France        300              10  2020-07-12     2020-07-12    2020-07-12                     1            300              0
+
+                Order Details
+                ------------------
+                  Order ID         Supplier Departure Date Delivery Date  Qty  Cost
+                0    VO001  Beerse, Belgium     2020-07-10    2020-07-12  300  50.0
+
+                Shipments
+                ------------------
+                         Type             From Departure Date               To Arrival Date  Qty  Reefers  Cost
+                1    Delivery  Beerse, Belgium     2020-07-10    Paris, France   2020-07-12  300        3    50
+                0  Reposition    Paris, France     2020-07-08  Beerse, Belgium   2020-07-09    0        2    20

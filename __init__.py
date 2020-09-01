@@ -27,6 +27,7 @@ app = Flask(__name__)
 
 # Import the Blueprints
 from userapp.server.api.new_order import new_order_blueprint
+from userapp.server.api.optimize import optimize_blueprint
 from userapp.server.api.data import data_blueprint
 from userapp.server.api.data_inventory import data_inventory_blueprint
 from userapp.server.api.data_orders import data_orders_blueprint
@@ -59,6 +60,7 @@ swagger_template = {
 }
 
 app.register_blueprint(new_order_blueprint)
+app.register_blueprint(optimize_blueprint)
 app.register_blueprint(data_blueprint)
 app.register_blueprint(data_inventory_blueprint)
 app.register_blueprint(data_orders_blueprint)

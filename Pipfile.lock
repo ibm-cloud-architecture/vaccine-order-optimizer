@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4c7eb9d812362c9b9739a35d8a017069347115b5bfd42d51a7987d8acc522bd6"
+            "sha256": "39ce3caa32b05fecc7bc8b1ef1398458013d1d052b4122676cb5e766bdb6c95b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -106,15 +106,6 @@
             "index": "pypi",
             "version": "==2.15.194"
         },
-        "docutils": {
-            "hashes": [
-                "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0",
-                "sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827",
-                "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"
-            ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==0.15.2"
-        },
         "flasgger": {
             "hashes": [
                 "sha256:0603941cf4003626b4ee551ca87331f1d17b8eecce500ccf1a1f1d3a332fc94a",
@@ -138,27 +129,6 @@
             ],
             "index": "pypi",
             "version": "==0.3.8"
-        },
-        "ibm-cos-sdk": {
-            "hashes": [
-                "sha256:998d8538e508c8ae50ea1ac52f4ed3ee8c62150e0e70365b96e4712199156108"
-            ],
-            "markers": "python_version ~= '3.5'",
-            "version": "==2.7.0"
-        },
-        "ibm-cos-sdk-core": {
-            "hashes": [
-                "sha256:9cf2dcd5514b45a84bdf6bfcb8c9bf5d4ce9808f8cf8539ffe9ee863ccf667f9"
-            ],
-            "markers": "python_version ~= '3.5'",
-            "version": "==2.7.0"
-        },
-        "ibm-cos-sdk-s3transfer": {
-            "hashes": [
-                "sha256:31fe288d641fcbf90e98a4741efbce93096fbf86096e9e2603fcc4d520868e97"
-            ],
-            "markers": "python_version ~= '3.5'",
-            "version": "==2.7.0"
         },
         "idna": {
             "hashes": [
@@ -192,27 +162,12 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==2.11.2"
         },
-        "jmespath": {
-            "hashes": [
-                "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9",
-                "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"
-            ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==0.10.0"
-        },
         "jsonschema": {
             "hashes": [
                 "sha256:4e5b3cf8216f577bee9ce139cbe72eca3ea4f292ec60928ff24758ce626cd163",
                 "sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"
             ],
             "version": "==3.2.0"
-        },
-        "lomond": {
-            "hashes": [
-                "sha256:427936596b144b4ec387ead99aac1560b77c8a78107d3d49415d3abbe79acbd3",
-                "sha256:df1dd4dd7b802a12b71907ab1abb08b8ce9950195311207579379eb3b1553de7"
-            ],
-            "version": "==0.3.3"
         },
         "markupsafe": {
             "hashes": [
@@ -367,21 +322,6 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==1.15.0"
         },
-        "tabulate": {
-            "hashes": [
-                "sha256:ac64cb76d53b1231d364babcd72abbb16855adac7de6665122f97b593f1eb2ba",
-                "sha256:db2723a20d04bcda8522165c73eea7c300eda74e0ce852d9022e0159d7895007"
-            ],
-            "version": "==0.8.7"
-        },
-        "tqdm": {
-            "hashes": [
-                "sha256:1a336d2b829be50e46b84668691e0a2719f26c97c62846298dd5ae2937e4d5cf",
-                "sha256:564d632ea2b9cb52979f7956e093e831c28d441c11751682f84c86fc46e4fd21"
-            ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
-            "version": "==4.48.2"
-        },
         "urllib3": {
             "hashes": [
                 "sha256:91056c15fa70756691db97756772bb1eb9678fa585d9184f24534b100dc60f4a",
@@ -389,14 +329,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
             "version": "==1.25.10"
-        },
-        "watson-machine-learning-client": {
-            "hashes": [
-                "sha256:505c6fb14eada339e834e1aea25a41726ac7b0ebe96e812b8e4339b056f0ea68",
-                "sha256:63436db653f2fe218039cad1dcf83108c9eb703618c00d10599d82f41448bb08"
-            ],
-            "index": "pypi",
-            "version": "==1.0.378"
         },
         "werkzeug": {
             "hashes": [

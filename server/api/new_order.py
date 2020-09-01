@@ -1,14 +1,12 @@
 
-from flask import Blueprint, request, abort, Response
+from flask import Blueprint, request
 import logging, json
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.routes.prometheus import track_requests
-from userapp.server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
-from userapp import reefer_consumer, inventory_consumer, transportation_consumer, orders
-from datetime import date
+from userapp import orders
 """
- created a new instance of the Blueprint class and bound the OrderShipmentController resource to it.
+ created a new instance of the Blueprint class and bound the NewOrder resource to it.
 """
 
 new_order_blueprint = Blueprint("new_order", __name__)
@@ -17,11 +15,7 @@ api = Api(new_order_blueprint)
 # The python-flask stack includes the prometheus metrics engine. You can ensure your endpoints
 # are included in these metrics by enclosing them in the @track_requests wrapper.
 
-class OrderShipmentController(Resource):  
-
-    def get(self):
-        return {"status": "success", "message": "present "}
-    
+class NewOrder(Resource):  
 
     # Need to support asynchronous HTTP Request, return 202 accepted while starting 
     # the processing of generating events. The HTTP header needs to return a
@@ -29,30 +23,12 @@ class OrderShipmentController(Resource):
     @track_requests
     @swag_from('new_order.yml')
     def post(self):
-        print('[OrderShipmentController] - New Order post request received')
+        print('[NewOrder] - New Order post request received')
         order_json = request.get_json(force=True)
-        print('[OrderShipmentController] - Order object ' + json.dumps(order_json))
+        print('[NewOrder] - Order object ' + json.dumps(order_json))
         # TBD: Do some data validation so that we make sure the order comes with the attributes and values we expect
         # Process order and add it to the existing orders
         orders.processOrder(order_json)
-        # Create the optimizer
-        optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
-        optimizer.prepare_data(orders.getOrdersPanda(), reefer_consumer.getEventsPanda(), inventory_consumer.getEventsPanda(), transportation_consumer.getEventsPanda())
-        optimizer.optimize()
-        
-        # Get the optimization solution
-        plan_orders, plan_orders_details, plan_shipments = optimizer.get_sol_panda()
-        result = "Orders\n"
-        result += "------------------\n"
-        result += plan_orders.to_string() + "\n\n"
-        result += "Order Details\n"
-        result += "------------------\n"
-        result += plan_orders_details.to_string() + "\n\n"
-        result += "Shipments\n"
-        result += "------------------\n"
-        result += plan_shipments.to_string()
-        
-        return Response(result, 202, {'Content-Type': 'text/plaintext'})
+        return "New order processed", 202
 
-
-api.add_resource(OrderShipmentController, "/api/v1/new-order")
+api.add_resource(NewOrder, "/api/v1/new-order")
