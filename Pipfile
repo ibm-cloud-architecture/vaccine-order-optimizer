@@ -13,6 +13,7 @@ pandas = "*"
 docplex = "==2.15.194"
 watson-machine-learning-client = "==1.0.378"
 confluent_kafka = "==1.2.0"
+cplex = "==12.10.0.3"
 
 [requires]
 python_version = "3.7"

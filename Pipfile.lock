@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0d53d2f83f5b06c33a3dfaf16bc85fed5000807a3ed8c9a0aead7b428b10a2b3"
+            "sha256": "4c7eb9d812362c9b9739a35d8a017069347115b5bfd42d51a7987d8acc522bd6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -84,6 +84,20 @@
             ],
             "index": "pypi",
             "version": "==1.2.0"
+        },
+        "cplex": {
+            "hashes": [
+                "sha256:06870b58ca751d9e9cd9dd14ae0f428ae6080417b97900e4d6ff5cb167dcc4cb",
+                "sha256:0aa31bb32baa77e75e24a1b4f15d93330fd45122c437e1e23b9b7f5288a95afe",
+                "sha256:200293c4bdc8471f92ef3434ad37c10eef6ac15c7ad237702a86a377e1a14c12",
+                "sha256:338b1333b099355ee3bf73734a15a72e89a57aa72e8d0237ea29491d22ae25cd",
+                "sha256:4dc416408d643babfb430cc41f1186663237eb2cb92cee03032e0ec9dbf7d40f",
+                "sha256:582f52138204438bd20a1a7eb6090117bd94418c40f490f3fab8e03b92e48173",
+                "sha256:8e02c3af629419a39401f04eefd259268cdf1fc0147153c7ec841ef1d2f56108",
+                "sha256:e8d7cb2c5f3fb35cdd05524962e8ef7eb5ec1b6c5b40ed94bcb3270ae552bc51"
+            ],
+            "index": "pypi",
+            "version": "==12.10.0.3"
         },
         "docplex": {
             "hashes": [

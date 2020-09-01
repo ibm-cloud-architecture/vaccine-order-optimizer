@@ -1,11 +1,12 @@
 
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, Response
 import logging, json
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.routes.prometheus import track_requests
 from userapp.server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
 from userapp import reefer_consumer, inventory_consumer, transportation_consumer, orders
+from datetime import date
 """
  created a new instance of the Blueprint class and bound the OrderShipmentController resource to it.
 """
@@ -31,17 +32,27 @@ class OrderShipmentController(Resource):
         print('[OrderShipmentController] - New Order post request received')
         order_json = request.get_json(force=True)
         print('[OrderShipmentController] - Order object ' + json.dumps(order_json))
-        # do some data validation
+        # TBD: Do some data validation so that we make sure the order comes with the attributes and values we expect
         # Process order and add it to the existing orders
         orders.processOrder(order_json)
-        # #####optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
-        # call: optimizer.optimize(orders)
-        # New call: optimizer.optimize(orders.getOrdersPanda(),reefer_consumer.getEventsPanda(), inventory_consumer.getEventsPanda(), transportation_consumer.getEventsPanda())
-
-        # if not 'containerID' in order:
-        #     abort(400) 
-        return "New order processed!",202
-    
+        # Create the optimizer
+        optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)
+        optimizer.prepare_data(orders.getOrdersPanda(), reefer_consumer.getEventsPanda(), inventory_consumer.getEventsPanda(), transportation_consumer.getEventsPanda())
+        optimizer.optimize()
+        
+        # Get the optimization solution
+        plan_orders, plan_orders_details, plan_shipments = optimizer.get_sol_panda()
+        result = "Orders\n"
+        result += "------------------\n"
+        result += plan_orders.to_string() + "\n\n"
+        result += "Order Details\n"
+        result += "------------------\n"
+        result += plan_orders_details.to_string() + "\n\n"
+        result += "Shipments\n"
+        result += "------------------\n"
+        result += plan_shipments.to_string()
+        
+        return Response(result, 202, {'Content-Type': 'text/plaintext'})
 
 
 api.add_resource(OrderShipmentController, "/api/v1/new-order")
