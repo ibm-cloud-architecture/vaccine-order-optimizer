@@ -1,0 +1,48 @@
+{   
+    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "doc": "Avro data schema for Vaccine Order Optimizer events",
+    "type":"record",
+    "name":"vaccineOrderOptimizerEvent",
+    "fields":[
+            {
+                "name": "type",
+                "type": "string",
+                "doc": "Type of event"
+            },
+            {
+                "name": "specversion",
+                "type": "string",
+                "doc": "CloudEvents specVersion"
+            },
+            {
+                "name": "source",
+                "type": "string",
+                "doc": "The source where this event comes from"
+            },
+            {
+                "name": "id",
+                "type": "string",
+                "doc": "CloudEvents event uniquely id"
+            },
+            {
+                "name": "time",
+                "type": "string",
+                "doc": "Time when this event was created"
+            },
+            {
+                "name": "dataschema",
+                "type": "string",
+                "doc": "Location of the event's Avro data schema"
+            },
+            {
+                "name": "datacontenttype",
+                "type": "string",
+                "doc": "Type of the data attribute's content"
+            },
+            {
+                "name": "data",
+                "type": ["ibm.com.vaccine.orderoptimizer.inventory","ibm.com.vaccine.orderoptimizer.reefer","ibm.com.vaccine.orderoptimizer.transportation"],
+                "doc": "The event"
+            }
+    ]
+}

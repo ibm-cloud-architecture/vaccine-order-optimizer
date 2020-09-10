@@ -2,15 +2,15 @@ apiVersion: appsody.dev/v1beta1
 kind: AppsodyApplication
 metadata:
   annotations:
-    commit.image.appsody.dev/date: Fri Aug 28 21:11:47 2020 +0200
-    commit.image.appsody.dev/message: third drop
+    commit.image.appsody.dev/date: Tue Sep 1 18:19:08 2020 +0200
+    commit.image.appsody.dev/message: optimize code refactor and API
     commit.stack.appsody.dev/contextDir: /incubator/python-flask
     commit.stack.appsody.dev/date: Tue Jun 16 13:12:10 2020 +0100
     commit.stack.appsody.dev/message: 'python-flask: Avoid permission errors when
       building dependencies (#834)'
-    image.opencontainers.org/created: "2020-08-31T18:34:59+02:00"
+    image.opencontainers.org/created: "2020-09-01T18:19:54+02:00"
     image.opencontainers.org/documentation: https://github.com/jesusmah/vaccine-order-optimizer
-    image.opencontainers.org/revision: e7362eee0e7ac002d018fa253aca7c4d4fcf0d3a-modified
+    image.opencontainers.org/revision: 8311024272ff08c3b5c9ad93cea7e69d4b7a51e1
     image.opencontainers.org/source: https://github.com/jesusmah/vaccine-order-optimizer/tree/master
     image.opencontainers.org/url: https://github.com/jesusmah/vaccine-order-optimizer
     stack.appsody.dev/authors: Chris Bailey <seabaylea>, Henry Nash <henrynash>

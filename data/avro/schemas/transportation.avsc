@@ -1,0 +1,38 @@
+{   
+    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "doc": "Avro data schema for transportation events",
+    "type":"record",
+    "name":"transportation",
+    "fields":[
+            {
+                "name": "lane_id",
+                "type": "string",
+                "doc": "Inventory lot ID"
+            },
+            {
+                "name": "from_loc",
+                "type": "string",
+                "doc": "Origin location for this transport"
+            },
+            {
+                "name": "to_loc",
+                "type": "string",
+                "doc": "Destination location for this transport"
+            },
+            {
+                "name": "transit_time",
+                "type": "int",
+                "doc": "Time it takes for the transportation"
+            },
+            {
+                "name": "reefer_cost",
+                "type": "int",
+                "doc": "Cost associated for a Reefer container in this transportation"
+            },
+            {
+                "name": "fixed_cost",
+                "type": "int",
+                "doc": "Fixed cost associated for this transportation"
+            }
+     ]
+}

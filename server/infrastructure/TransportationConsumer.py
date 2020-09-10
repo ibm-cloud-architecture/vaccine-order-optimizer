@@ -1,6 +1,7 @@
 import json, threading, time
-from userapp.server.infrastructure.kafka.KafkaConsumer import KafkaConsumer
+from userapp.server.infrastructure.kafka.KafkaAvroConsumer import KafkaAvroConsumer
 import userapp.server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
+import userapp.server.infrastructure.kafka.avroUtils as avroUtils
 import pandas as pd
 
 class TransportationConsumer:
@@ -13,8 +14,10 @@ class TransportationConsumer:
         self.events_panda={}
         self.events={}
         self.index=0
-        self.kafkaconsumer=KafkaConsumer(EventBackboneConfig.getTransportationTopicName())
-        self.kafkaconsumer.prepareConsumer('TransportationConsumer')
+        self.cloudEvent_schema = avroUtils.getCloudEventSchema()
+        self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
+                                            EventBackboneConfig.getTransportationTopicName(),
+                                            "TransportationConsumer")
 
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
@@ -25,8 +28,8 @@ class TransportationConsumer:
         while True:
             event = self.kafkaconsumer.pollNextRawEvent()
             if event is not None:
-                print('[TransportationConsumer] - New event consumed: ' + event.value().decode('utf-8'))
-                event_json = json.loads(event.value().decode('utf-8'))
+                print('[TransportationConsumer] - New event consumed: ' + json.dumps(event.value()))
+                event_json = event.value()['data']
                 if ( len(self.events_panda) == 0 ):
                     for key, value in event_json.items():
                         self.events_panda[key] = {0:value}
@@ -37,7 +40,7 @@ class TransportationConsumer:
                         intermediate[self.index] = value
                         self.events_panda[key] = intermediate
                     self.index+=1
-                self.events[event.key().decode('utf-8')] = json.loads(event.value().decode('utf-8'))
+                self.events[event.key()] = event_json
             # time.sleep(1)
     
     def getEvents(self):
