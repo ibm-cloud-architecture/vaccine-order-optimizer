@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+Flask = ">=1.1.1"
+flask-restful = ">=0.3.7"
+flasgger = "==0.9.5"
+pandas = "*"
+docplex = "==2.15.194"
+cplex = "==12.10.0.3"
+confluent-kafka = "==1.4.0"
+avro-python3 = "==1.10.0"
+cloudevents = "==1.2.0"
+fastavro = "==1.0.0.post1"
+
+[requires]
+python_version = "3.7"

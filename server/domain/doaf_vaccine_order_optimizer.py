@@ -7,17 +7,6 @@ from collections import defaultdict, namedtuple
 from datetime import date, timedelta
 from docplex.mp.model import Model
 
-DOSOLVER = 'Cloud'
-
-if DOSOLVER == 'Cloud': 
-    from watson_machine_learning_client import WatsonMachineLearningAPIClient
-    wml_credentials = {
-      "apikey": "CZAWhGYAgk1oCB-UcR_cSWRhEKUwJQGOzxWbxFKqcohz",
-      "instance_id": "955338a9-1470-44bf-ab58-162eacc8113e",
-      "url": "https://us-south.ml.cloud.ibm.com",
-    }
-    client = WatsonMachineLearningAPIClient(wml_credentials)
-
 REEFER_CAP = 100
 RDD_WIN_PRE = 1
 RDD_WIN_AFT = 1
@@ -50,43 +39,64 @@ class VaccineOrderOptimizer(object):
 
         self.data = {}
 
-    def load_data_excel(self, name): 
-        ''' Load data from excel file
+    # def load_data_excel(self, name): 
+    #     ''' Load data from excel file
 
-        name: is the base name of the file, suffix will be added
-        '''
-        fname = os.path.join('data', 'excel', f'{name}.xlsx')
-        assert os.path.exists(fname)
+    #     name: is the base name of the file, suffix will be added
+    #     '''
+    #     fname = os.path.join('data', 'excel', f'{name}.xlsx')
+    #     assert os.path.exists(fname)
 
-        if self.debug: 
-            print(f"Load data from excel file: {fname}")
-        self.log_msgs.append(f"* Load data from excel file: {fname}")
+    #     if self.debug: 
+    #         print(f"Load data from excel file: {fname}")
+    #     self.log_msgs.append(f"* Load data from excel file: {fname}")
         
-        self.data['REEFER'] = pd.read_excel(fname, 'REEFER')
-        self.data['INVENTORY'] = pd.read_excel(fname, 'INVENTORY')
-        self.data['TRANSPORTATION'] = pd.read_excel(fname, 'TRANSPORTATION')
-        # self.data['ORDER'] = pd.read_excel(fname, 'ORDER')
+    #     self.data['REEFER'] = pd.read_excel(fname, 'REEFER')
+    #     self.data['INVENTORY'] = pd.read_excel(fname, 'INVENTORY')
+    #     self.data['TRANSPORTATION'] = pd.read_excel(fname, 'TRANSPORTATION')
 
-        self.process_data()
+    #     self.process_data()
         
-    def load_data_csv(self, name): 
-        ''' Load data from csv files from a folder folder
+    # def load_data_csv(self, name): 
+    #     ''' Load data from csv files from a folder folder
+    #     '''
+    #     dir = os.path.join('/project/userapp/data/csv', name)
+    #     # dir = os.path.join('data', 'csv', name)
+    #     assert os.path.exists(dir)
+
+    #     if self.debug: 
+    #         print(f"Load data from csv files from: {dir}")
+    #     self.log_msgs.append(f"Load data from csv files from: {dir}")
+
+    #     self.data['REEFER'] = pd.read_csv(os.path.join(dir, "REEFER.csv"))
+    #     self.data['REEFER']['DATE_AVAILABLE'] = pd.to_datetime(self.data['REEFER']['DATE_AVAILABLE'], format='%m/%d/%Y')
+
+    #     self.data['INVENTORY'] = pd.read_csv(os.path.join(dir, "INVENTORY.csv"))
+    #     self.data['INVENTORY']['DATE_AVAILABLE'] = pd.to_datetime(self.data['INVENTORY']['DATE_AVAILABLE'], format='%m/%d/%Y')
+
+    #     self.data['TRANSPORTATION'] = pd.read_csv(os.path.join(dir, "TRANSPORTATION.csv"))
+
+    #     self.process_data()
+    
+    def prepare_data(self, orders, reefer, inventory, transportation): 
+        ''' Prepare the data
         '''
-        dir = os.path.join('data', 'csv', name)
-        assert os.path.exists(dir)
+        ###############
+        # Question: Do we need to replace empty strings in every column?
+        ###############
+        self.data['REEFER'] = reefer
+        self.data['REEFER']['date_available'] = self.data['REEFER']['date_available'].replace(r'^\s*$', np.nan, regex=True)
+        self.data['REEFER']['date_available'] = pd.to_datetime(self.data['REEFER']['date_available'], format='%m/%d/%Y')
 
-        if self.debug: 
-            print(f"Load data from csv files from: {dir}")
-        self.log_msgs.append(f"Load data from csv files from: {dir}")
+        self.data['INVENTORY'] = inventory
+        self.data['INVENTORY']['date_available'] = self.data['INVENTORY']['date_available'].replace(r'^\s*$', np.nan, regex=True)
+        self.data['INVENTORY']['date_available'] = pd.to_datetime(self.data['INVENTORY']['date_available'], format='%m/%d/%Y')
 
-        self.data['REEFER'] = pd.read_csv(os.path.join(dir, "REEFER.csv"))
-        self.data['REEFER']['DATE_AVAILABLE'] = pd.to_datetime(self.data['REEFER']['DATE_AVAILABLE'], format='%m/%d/%Y')
+        self.data['TRANSPORTATION'] = transportation
 
-        self.data['INVENTORY'] = pd.read_csv(os.path.join(dir, "INVENTORY.csv"))
-        self.data['INVENTORY']['DATE_AVAILABLE'] = pd.to_datetime(self.data['INVENTORY']['DATE_AVAILABLE'], format='%m/%d/%Y')
-
-        self.data['TRANSPORTATION'] = pd.read_csv(os.path.join(dir, "TRANSPORTATION.csv"))
-        # self.data['ORDER'] = pd.read_csv(os.path.join(dir, "ORDER.csv"))
+        self.data['ORDERS'] = orders
+        self.data['ORDERS']['request_delivery_date'] = self.data['ORDERS']['request_delivery_date'].replace(r'^\s*$', np.nan, regex=True)
+        self.data['ORDERS']['request_delivery_date'] = pd.to_datetime(self.data['ORDERS']['request_delivery_date'], format='%m/%d/%Y')
 
         self.process_data()
 
@@ -97,17 +107,17 @@ class VaccineOrderOptimizer(object):
         self.inv_qty = defaultdict(int)     # Qty available at supplier loc, keyed by supplier loc/day
         self.inv_lots = defaultdict(list)   # Lot available at supplier loc, keyed by supplier loc/day
         for _, rec in self.data['INVENTORY'].iterrows(): 
-            loc = rec['LOCATION']
-            if pd.isnull(rec['DATE_AVAILABLE']) or rec['DATE_AVAILABLE'].date() <= self.start_date: 
+            loc = rec['location']
+            if pd.isnull(rec['date_available']) or rec['date_available'].date() <= self.start_date: 
                 day = 0
             else: 
-                day = (rec['DATE_AVAILABLE'].date() - self.start_date).days
-            qty = 0 if pd.isnull(rec['QTY']) or rec['QTY'] < 0 else rec['QTY']
+                day = (rec['date_available'].date() - self.start_date).days
+            qty = 0 if pd.isnull(rec['qty']) or rec['qty'] < 0 else rec['qty']
             
             self.supplier_locs.add(loc)
             if qty > 0: 
                 self.inv_qty[(loc, day)] += qty
-                self.inv_lots[(loc, day)].append((rec['LOT_ID'], qty))
+                self.inv_lots[(loc, day)].append((rec['lot_id'], qty))
 
         self.inv_qty = dict(self.inv_qty)
         self.inv_lots = dict(self.inv_lots)
@@ -116,43 +126,43 @@ class VaccineOrderOptimizer(object):
         self.reefer_qty = defaultdict(int)      # Reefer qty available at loc, keyed by loc/day
         self.reefer_info = defaultdict(list)    # Reefer info available at loc, keyed by loc/day
         for _, rec in self.data['REEFER'].iterrows(): 
-            loc = rec['LOCATION']
-            if pd.isnull(rec['DATE_AVAILABLE']) or rec['DATE_AVAILABLE'].date() <= self.start_date: 
+            loc = rec['location']
+            if pd.isnull(rec['date_available']) or rec['date_available'].date() <= self.start_date: 
                 day = 0
             else: 
-                day = (rec['DATE_AVAILABLE'].date() - self.start_date).days
+                day = (rec['date_available'].date() - self.start_date).days
             
             if loc not in self.supplier_locs: 
                 self.customer_locs.add(loc)
             self.reefer_qty[(loc, day)] += 1
-            self.reefer_info[(loc, day)].append((rec['REEFER_ID'], rec['STATUS']))
+            self.reefer_info[(loc, day)].append((rec['reefer_id'], rec['status']))
 
         self.reefer_qty = dict(self.reefer_qty)
         self.reefer_info = dict(self.reefer_info)
 
         self.lanes = {}
         for _, rec in self.data['TRANSPORTATION'].iterrows(): 
-            from_loc = rec['FROM_LOC']
-            to_loc = rec['TO_LOC']
+            from_loc = rec['from_loc']
+            to_loc = rec['to_loc']
             if from_loc not in self.supplier_locs: 
                 self.customer_locs.add(from_loc)
             if to_loc not in self.supplier_locs: 
                 self.customer_locs.add(to_loc)
-            self.lanes[(from_loc, to_loc)] = Lane(rec['LANE_ID'], from_loc, to_loc, int(rec['TRANSIT_TIME']), rec['REEFER_COST'], rec['FIXED_COST'])
+            self.lanes[(from_loc, to_loc)] = Lane(rec['lane_id'], from_loc, to_loc, int(rec['transit_time']), rec['reefer_cost'], rec['fixed_cost'])
 
-    def optimize(self, orders): 
+    def optimize(self): 
         ''' Optimize for a list of orders
         '''
         self.orders = {}
-        for _, rec in orders.iterrows(): 
-            if pd.isnull(rec['RDD']) or rec['RDD'].date() <= self.start_date: 
+        for _, rec in self.data['ORDERS'].iterrows(): 
+            if pd.isnull(rec['request_delivery_date']) or rec['request_delivery_date'].date() <= self.start_date: 
                 rdd = 1     # Default to day 1
             else: 
-                rdd = (rec['RDD'].date() - self.start_date).days
+                rdd = (rec['request_delivery_date'].date() - self.start_date).days
 
-            loc = rec['DESTINATION']
+            loc = rec['destination']
             if loc in self.customer_locs: 
-                self.orders[rec['ORDER_ID']] = Order(rec['ORDER_ID'], loc, int(rec['QTY']), rdd, rec['PRIORITY'])
+                self.orders[rec['order_id']] = Order(rec['order_id'], loc, int(rec['quantity']), rdd, rec['priority'])
             else: 
                 print(f"Order {rec} is ignored due to unknown customer location")
 
@@ -329,13 +339,8 @@ class VaccineOrderOptimizer(object):
     def solve(self): 
         ''' Solve the model
         '''
-        if DOSOLVER == 'Cloud': 
-            print("Solve optimization with IBM cloud")
-            ms = self.model.solve(log_output=self.debug)
-            # print(client.repository.ModelMetaNames.show())
-        else:
-            print("Solve optimization with DO local")
-            ms = self.model.solve(log_output=self.debug, agent='local')
+        print("Solve optimization with DO local")
+        ms = self.model.solve(log_output=self.debug, agent='local')
 
         if not ms:
             details = self.model.get_solve_details()
@@ -497,6 +502,12 @@ class VaccineOrderOptimizer(object):
         return {"Orders":self.plan_orders.to_json(orient='records', date_format='iso'), 
                  "OrderDetails":self.plan_order_details.to_json(orient='records', date_format='iso'),
                  "Shipments":self.plan_shipments.to_json(orient='records', date_format='iso')}
+    
+    def get_sol_panda(self):
+        return self.plan_orders, self.plan_order_details, self.plan_shipments
+    
+    def getLogs(self):
+        return "\n  ".join(self.log_msgs)
 
 if __name__ == '__main__':
     optimizer = VaccineOrderOptimizer(start_date=date(2020, 7, 6), debug=False)

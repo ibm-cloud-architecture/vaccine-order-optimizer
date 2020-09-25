@@ -1,0 +1,47 @@
+Process new vaccine order
+---
+consumes:
+    - application-json
+parameters:
+  - in: body
+    name: order
+    description: New vaccine order json object
+    required: true
+    schema:
+        $ref: "#/definitions/Order"
+responses:
+    202:
+        description: New order successfully processed
+        examples:
+            text/plaintext: New order processed
+    400:
+        description: Order Id is missing
+    404:
+        description: An error occurred during the order optimization process
+definitions:
+    Order:
+        title: order
+        type: object
+        properties:
+            order_id:
+                type: string
+            destination:
+                type: string
+            quantity:
+                type: integer
+                minimum: 1
+                maximum: 100000
+            request_delivery_date: 
+                type: string
+            priority:
+                type: integer
+                minimum: 1
+                maximum: 10
+        required:
+            - order_id
+        example:
+            order_id: VO001
+            destination: Paris, France
+            quantity: 300
+            request_delivery_date: 7/12/2020
+            priority: 10

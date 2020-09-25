@@ -1,0 +1,28 @@
+{   
+    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "doc": "Avro data schema for inventory events",
+    "type":"record",
+    "name":"inventory",
+    "fields":[
+            {
+                "name": "lot_id",
+                "type": "string",
+                "doc": "Inventory lot ID"
+            },
+            {
+                "name": "qty",
+                "type": "int",
+                "doc": "Quantity"
+            },
+            {
+                "name": "location",
+                "type": "string",
+                "doc": "Inventory location"
+            },
+            {
+                "name": "date_available",
+                "type": "string",
+                "doc": "Date when the inventory will be available"
+            }
+     ]
+}

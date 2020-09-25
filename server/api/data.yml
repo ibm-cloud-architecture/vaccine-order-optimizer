@@ -1,0 +1,49 @@
+Get Reefer, Inventory, Transportation and Orders data
+---
+responses:
+    202:
+        description: Reefer, Inventory, Transportation and Orders data
+        examples:
+            application-json: {"INVENTORY": {
+                                    "L0001": {
+                                    "date_available": "", 
+                                    "location": "Beerse, Belgium", 
+                                    "lot_id": "L0001", 
+                                    "qty": "200"
+                                    }
+                                }, 
+                                "REEFER": {
+                                    "RC00001": {
+                                    "date_available": "", 
+                                    "location": "Beerse, Belgium", 
+                                    "reefer_id": "RC00001", 
+                                    "status": "Ready"
+                                    }
+                                }, 
+                                "TRANSPORTATION": {
+                                    "1": {
+                                    "fixed_cost": "20", 
+                                    "from_loc": "Beerse, Belgium", 
+                                    "lane_id": "1", 
+                                    "reefer_cost": "10", 
+                                    "to_loc": "Paris, France", 
+                                    "transit_time": "2"
+                                    }
+                                },
+                                "ORDERS": {
+                                    "VO001": {
+                                        "destination": "Paris, France",
+                                        "order_id": "VO001",
+                                        "priority": 10,
+                                        "quantity": 300,
+                                        "request_delivery_date": "7/12/2020"
+                                    },
+                                    "VO002": {
+                                        "destination": "Madrid, Spain",
+                                        "order_id": "VO002",
+                                        "priority": 2,
+                                        "quantity": 100,
+                                        "request_delivery_date": "15/12/2020"
+                                    }
+                                }
+                                }

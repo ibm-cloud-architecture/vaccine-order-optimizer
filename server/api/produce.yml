@@ -1,0 +1,7 @@
+Produce Reefer, Inventory and Transportation test data
+---
+responses:
+    202:
+        description: Reefer, Inventory and Transportation test data successfully generated
+        examples:
+            text/plaintext: Done

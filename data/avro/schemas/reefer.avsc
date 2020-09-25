@@ -1,0 +1,28 @@
+{   
+    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "doc": "Avro data schema for Reefer events",
+    "type":"record",
+    "name":"reefer",
+    "fields":[
+            {
+                "name": "reefer_id",
+                "type": "string",
+                "doc": "Reefer container ID"
+            },
+            {
+                "name": "status",
+                "type": "string",
+                "doc": "Reefer Container ID status. Could be an Enum"
+            },
+            {
+                "name": "location",
+                "type": "string",
+                "doc": "Reefer container location"
+            },
+            {
+                "name": "date_available",
+                "type": "string",
+                "doc": "Date when the inventory will be available"
+            }
+     ]
+}

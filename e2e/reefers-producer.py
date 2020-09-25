@@ -1,6 +1,6 @@
 import logging
 from server.infrastructure.kafka.KafkaProducer import KafkaProducer
-import server.infrastructure.kafka.eventStreamsConfig as config
+import server.infrastructure.kafka.eventBackboneConfig as config
 
 if __name__ == '__main__':
     print("Start Reefer Event Producer")
