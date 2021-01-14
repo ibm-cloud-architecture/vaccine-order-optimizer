@@ -2,17 +2,18 @@ apiVersion: appsody.dev/v1beta1
 kind: AppsodyApplication
 metadata:
   annotations:
-    commit.image.appsody.dev/date: Tue Sep 1 18:19:08 2020 +0200
-    commit.image.appsody.dev/message: optimize code refactor and API
+    commit.image.appsody.dev/contextDir: /Users/jeromeboyer/code/AllCloudPaks/vaccine-order-optimizer
+    commit.image.appsody.dev/date: Fri Sep 25 08:22:57 2020 -0700
+    commit.image.appsody.dev/message: 'Merge pull request #1 from jesusmah/master'
     commit.stack.appsody.dev/contextDir: /incubator/python-flask
     commit.stack.appsody.dev/date: Tue Jun 16 13:12:10 2020 +0100
     commit.stack.appsody.dev/message: 'python-flask: Avoid permission errors when
       building dependencies (#834)'
-    image.opencontainers.org/created: "2020-09-01T18:19:54+02:00"
-    image.opencontainers.org/documentation: https://github.com/jesusmah/vaccine-order-optimizer
-    image.opencontainers.org/revision: 8311024272ff08c3b5c9ad93cea7e69d4b7a51e1
-    image.opencontainers.org/source: https://github.com/jesusmah/vaccine-order-optimizer/tree/master
-    image.opencontainers.org/url: https://github.com/jesusmah/vaccine-order-optimizer
+    image.opencontainers.org/created: "2021-01-13T21:10:20-08:00"
+    image.opencontainers.org/documentation: https://github.com/ibm-cloud-architecture/vaccine-order-optimizer
+    image.opencontainers.org/revision: e509f343dc7f7ebbe2340c01cc510a47b83d545e-modified
+    image.opencontainers.org/source: https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/tree/master
+    image.opencontainers.org/url: https://github.com/ibm-cloud-architecture/vaccine-order-optimizer
     stack.appsody.dev/authors: Chris Bailey <seabaylea>, Henry Nash <henrynash>
     stack.appsody.dev/configured: docker.io/appsody/python-flask:latest
     stack.appsody.dev/created: "2020-06-16T12:14:33Z"
@@ -33,29 +34,29 @@ metadata:
     stack.appsody.dev/version: 0.2.4
   name: vaccine-order-optimizer
 spec:
-  applicationImage: ibmcase/vaccine-order-optimizer:latest
+  applicationImage: dev.local/vaccine-order-optimizer
   createKnativeService: false
   env:
   - name: KAFKA_BROKERS
     valueFrom:
       configMapKeyRef:
         key: brokers
-        name: kafka-brokers
+        name: vaccine-oro-cm
   - name: REEFER_TOPIC
     valueFrom:
       configMapKeyRef:
         key: reeferTopic
-        name: vaccine-kafka-topics
+        name: vaccine-oro-cm
   - name: INVENTORY_TOPIC
     valueFrom:
       configMapKeyRef:
         key: inventoryTopic
-        name: vaccine-kafka-topics
+        name: vaccine-oro-cm
   - name: TRANSPORTATION_TOPIC
     valueFrom:
       configMapKeyRef:
         key: transportationTopic
-        name: vaccine-kafka-topics
+        name: vaccine-oro-cm
   - name: KAFKA_USER
     valueFrom:
       secretKeyRef:

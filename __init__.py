@@ -1,9 +1,10 @@
 from flask import Flask, redirect, abort, Response, Blueprint
 from flasgger import Swagger
-
 import os, time, json
 from datetime import datetime
-import pandas as pd
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 # Application specifics
 from userapp.server.infrastructure.ReeferConsumer import ReeferConsumer
@@ -17,7 +18,7 @@ reefer_consumer = ReeferConsumer()
 transportation_consumer = TransportationConsumer()
 inventory_consumer = InventoryConsumer()
 
-# Create the orders object
+#  Keep current orders
 orders = Orders()
 # Create the data producer
 data_producer = DataProducer()

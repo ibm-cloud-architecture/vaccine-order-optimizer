@@ -8,7 +8,7 @@ verify_ssl = true
 [packages]
 Flask = ">=1.1.1"
 flask-restful = ">=0.3.7"
-flasgger = "==0.9.5"
+flasgger = ">=0.9.5"
 pandas = "*"
 docplex = "==2.15.194"
 cplex = "==12.10.0.3"

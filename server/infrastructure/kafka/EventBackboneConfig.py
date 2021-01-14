@@ -24,10 +24,10 @@ def getKafkaCertificate():
     return os.getenv('KAFKA_CERT','/certs/es-cert.pem')
 
 def getReeferTopicName():
-    return os.getenv("REEFER_TOPIC","reefer-testing")
+    return os.getenv("REEFER_TOPIC","reefers")
 
 def getInventoryTopicName():
-    return os.getenv("INVENTORY_TOPIC","inventory-testing")
+    return os.getenv("INVENTORY_TOPIC","vaccine_lots")
 
 def getTransportationTopicName():
-    return os.getenv("TRANSPORTATION_TOPIC","transportation-testing")
+    return os.getenv("TRANSPORTATION_TOPIC","transportation")

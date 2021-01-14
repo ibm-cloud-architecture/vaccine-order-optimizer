@@ -12,9 +12,6 @@ from userapp import orders
 new_order_blueprint = Blueprint("new_order", __name__)
 api = Api(new_order_blueprint)
 
-# The python-flask stack includes the prometheus metrics engine. You can ensure your endpoints
-# are included in these metrics by enclosing them in the @track_requests wrapper.
-
 class NewOrder(Resource):  
 
     # Need to support asynchronous HTTP Request, return 202 accepted while starting 
