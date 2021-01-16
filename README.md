@@ -2,30 +2,41 @@
 
 The use case and business problem addressed in this repository is described in [this article](https://ibm-cloud-architecture.github.io/vaccine-solution-main/design/voro/) in the main vaccine solution repository. 
 
-This repository is the implementation of a microservice that exposes API to do the order and refrigerated tank shipping plan optimization. 
+This repository is the implementation of a microservice that exposes API to do the order and refrigerated tank shipping plan optimization.
 
 It also works as event consumers to get manufacturing data asynchronously from a Kafka Topic.
 
 The following diagram illustrates all the components working together to support and event-driven shipment plan real time optimization:
 
-![](./docs/images/components.png)
+![](./docs/images/voro-components.png)
 
 
 ## Code Explanation
 
-The app.py includes the main code to start the Flask server. It defines APIs, starts the different Kafka Consumers:
+The [app.py](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/app.py) includes the main code to start the Flask server. It defines APIs, starts the different Kafka Consumers:
 
 * ReeferConsumer: for getting information about the refrigerator release and availability
 * InventoryConsumer: about vaccine lot inventory
 * TransportationConsumer: getting transportation constraints.
 
-The code produces shipment plan to the ``
+The code exposes a POST order operation and then produces updated shipment plan to integrate the new order. 
 
 ## Build
 
-```
+Simply build the docker image:
+
+```shell
 docker build -t ibmcase/vaccine-order-optimizer .
+
+docker push ibmcase/vaccine-order-optimizer
 ```
+
+The repository include a [github action workflow](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/.github/workflows/dockerbuild.yaml) to build and push the image automatically to the [public docker registry.](https://hub.docker.com/repository/docker/ibmcase/vaccine-order-optimizer)
+
+The flow uses a set of secrets in the git repo:
+* DOCKER_IMAGE_NAME = vaccine-order-optimizer
+* DOCKER_REPOSITORY = ibmcase
+* DOCKER_USERNAME and DOCKER_PASSWORD
 
 ## Run locally
 
@@ -42,7 +53,7 @@ docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_RE
 
 The swagger looks like:
 
-![](./docs/images/swagger.png)
+![](./docs/images/oro-swagger.png)
 
 ## Deploy to OpenShift
 
@@ -75,7 +86,7 @@ The swagger looks like:
 
  ```yaml
   - name: KAFKA_CERT
-    value: /certs/es-cert.pem
+    value: /app/certs/es-cert.pem
  ```
 
  the name of the file is equal to the name of the {.data.es-cert.pem} field in the secret.
@@ -113,6 +124,3 @@ They are used in the Deployment configuration as:
         key: password
         name: eventstreams-cred
  ```
-
-
-

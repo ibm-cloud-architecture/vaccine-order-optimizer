@@ -11,11 +11,11 @@ class DataProducer:
     def __init__(self):
         print("[DataProducer] - Initializing the data producers")
         # Get the data events file locations
-        self.inventory_file = "/project/userapp/data/txt/inventory.txt"
-        self.reefer_file = "/project/userapp/data/txt/reefer.txt"
-        self.transportation_file = "/project/userapp/data/txt/transportation.txt"
+        self.inventory_file = "/app/data/txt/inventory.txt"
+        self.reefer_file = "/app/data/txt/reefer.txt"
+        self.transportation_file = "/app/data/txt/transportation.txt"
         # Get the events Avro data schemas location
-        self.schemas_location = "/project/userapp/data/avro/schemas/"
+        self.schemas_location = "/app/data/avro/schemas/"
         # self.cloudEvent_schema = self.inventory_schema = avroUtils.getCloudEventSchema(self.schemas_location,"cloudEvent.avsc","inventory.avsc","reefer.avsc","transportation.avsc")
         self.cloudEvent_schema = self.inventory_schema = avroUtils.getCloudEventSchema()
         # Build the Kafka Avro Producers
