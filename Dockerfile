@@ -1,17 +1,15 @@
-FROM python:3.7
+FROM python:3.7.4-stretch
+ENV PATH=/root/.local/bin:$PATH
 
-RUN pip install --upgrade pip
+ENV PYTHONPATH=/app
 
-RUN useradd -m worker
-WORKDIR /project
-# It is a real shame that WORKDIR doesn't honor the current user (or even take a chown option), so.....
-RUN chown worker:worker /project
-USER worker
+RUN pip install --upgrade pip \
+  && pip install pipenv flask gunicorn
 
-RUN pip install --upgrade --user pipenv
-ENV PATH=/home/worker/.local/bin:$PATH
-
-COPY --chown=worker:worker . ./
-
+ADD . /app
+WORKDIR /app
 # First we get the dependencies for the stack itself
 RUN pipenv lock -r > requirements.txt
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD ["gunicorn", "-w 4", "-b 0.0.0.0:5000", "app:app"]

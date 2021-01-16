@@ -3,10 +3,10 @@
 #####################
 # Set these regardless of where your Event Streams on prem or on IBM Cloud or a local Kafka instance
 export KAFKA_BROKERS=""
-export REEFER_TOPIC="reefer-testing"
-export INVENTORY_TOPIC="inventory-testing"
-export TRANSPORTATION_TOPIC="transportation-testing"
-
+export REEFER_TOPIC="vaccine-reefer"
+export INVENTORY_TOPIC="vaccine-inventory"
+export TRANSPORTATION_TOPIC="vaccine-transportation"
+export SCHEMA_REGISTRY_URL=
 ######################
 ## OCP and IBMCLOUD ##
 ######################
@@ -21,5 +21,5 @@ export KAFKA_PASSWORD=""
 # Below where appsody will place the certificates you include in the certs folder of this project
 # If you are building the docker image yourself and then running it standalone or through docker compose, you
 # will most likely need to update the cert path
-export KAFKA_CERT="/project/userapp/certs/es-cert.pem"
+export KAFKA_CERT="/app/certs/es-cert.pem"
 

@@ -2,8 +2,9 @@
 from flask import Blueprint, Response
 from flasgger import swag_from
 from flask_restful import Resource, Api
-from server.routes.prometheus import track_requests
-from userapp import inventory_consumer
+from server.api.prometheus import track_requests
+from server.infrastructure.DataStore import DataStore
+
 """
  created a new instance of the Blueprint class and bound the DataInventory and DataInventoryPandas resources to it.
 """
@@ -21,7 +22,8 @@ class DataInventory(Resource):
     @swag_from('data_inventory.yml')
     def get(self):
         print('[DataInventoryResource] - calling /api/v1/data/inventory endpoint')
-        return inventory_consumer.getEvents(),202
+        ds = DataStore.getInstance()
+        return ds.getAllLotInventory(),202
 
 class DataInventoryPandas(Resource):  
 
@@ -30,7 +32,7 @@ class DataInventoryPandas(Resource):
     @swag_from('data_inventory_pandas.yml')
     def get(self):
         print('[DataInventoryPandasResource] - calling /api/v1/data/inventory/pandas endpoint')
-        return Response(inventory_consumer.getEventsPanda().to_string(), 202, {'Content-Type': 'text/plaintext'})
+        return Response(DataStore.getInstance().getAllReefersAsPanda().to_string(), 202, {'Content-Type': 'text/plaintext'})
 
 api.add_resource(DataInventory, "/api/v1/data/inventory")
 api.add_resource(DataInventoryPandas, "/api/v1/data/inventory/pandas")

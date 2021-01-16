@@ -34,8 +34,8 @@ class KafkaAvroProducer:
             url = os.environ['SCHEMA_REGISTRY_URL']
             # If we are talking to ES on prem, it uses an SSL self-signed certificate.
             # Therefore, we need the CA public certificate for the SSL connection to happen.
-            if (os.path.isfile(os.getenv('KAFKA_CERT','/certs/es-cert.pem'))):
-                ssl = os.getenv('KAFKA_CERT','/certs/es-cert.pem')
+            if (os.path.isfile(os.getenv('KAFKA_CERT','/app/certs/es-cert.pem'))):
+                ssl = os.getenv('KAFKA_CERT','/app/certs/es-cert.pem')
                 return {'url': url, 'ssl.ca.location': ssl}
             return {'url': url}
         except KeyError:

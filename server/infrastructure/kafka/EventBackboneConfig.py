@@ -17,7 +17,7 @@ def needsAuthentication():
     return KAFKA_PASSWORD != ''
 
 def isCertificateSecured():
-    KAFKA_CERT = os.getenv('KAFKA_CERT','/certs/es-cert.pem')
+    KAFKA_CERT = os.getenv('KAFKA_CERT','/app/certs/es-cert.pem')
     return os.path.isfile(KAFKA_CERT)
 
 def getKafkaCertificate():

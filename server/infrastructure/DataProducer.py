@@ -1,7 +1,7 @@
 import json, time, os, datetime, uuid
-from userapp.server.infrastructure.kafka.KafkaAvroProducer import KafkaAvroProducer
-import userapp.server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
-import userapp.server.infrastructure.kafka.avroUtils as avroUtils
+from server.infrastructure.kafka.KafkaAvroProducer import KafkaAvroProducer
+import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
+import server.infrastructure.kafka.avroUtils as avroUtils
 
 class DataProducer:
     """ 

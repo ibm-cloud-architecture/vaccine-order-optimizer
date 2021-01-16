@@ -1,7 +1,7 @@
 import avro.schema
 import json
 
-def getCloudEventSchema(schema_files_location = "/project/userapp/data/avro/schemas/",
+def getCloudEventSchema(schema_files_location = "/app/data/avro/schemas/",
                         cloudEvent = "cloudEvent.avsc",
                         inventory = "inventory.avsc",
                         reefer = "reefer.avsc",

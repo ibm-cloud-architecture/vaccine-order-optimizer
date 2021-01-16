@@ -13,7 +13,7 @@ The following diagram illustrates all the components working together to support
 
 ## Code Explanation
 
-The __init__.py includes the main code to start the Flask server. It defines APIs, starts the different Kafka Consumers:
+The app.py includes the main code to start the Flask server. It defines APIs, starts the different Kafka Consumers:
 
 * ReeferConsumer: for getting information about the refrigerator release and availability
 * InventoryConsumer: about vaccine lot inventory
@@ -23,13 +23,22 @@ The code produces shipment plan to the ``
 
 ## Build
 
-This project uses the [Appsody](https://appsody.dev/) python stack. You need Appsody CLI to build and deploy the application to OpenShift.
-
-`appsody build`
+```
+docker build -t ibmcase/vaccine-order-optimizer .
+```
 
 ## Run locally
 
-`appsody run`
+* Get the Kafka URL, schema registry URL, the user and password and any pem file containing the server certificate.
+* The certificate needs to be under certs folder.
+* Copy the script/setenv-tmpl.sh  to script/setenv.sh
+* modify the environment variables.
+
+```shell
+source ./script/setenv.sh
+
+docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL -e REEFER_TOPIC=$REEFER_TOPIC -e INVENTORY_TOPIC=$INVENTORY_TOPIC -e TRANSPORTATION_TOPIC=$TRANSPORTATION_TOPIC -e KAFKA_USER=$KAFKA_USER -e KAFKA_PASSWORD=$KAFKA_PASSWORD -e KAFKA_CERT=$KAFKA_CERT -p 5000:5000  ibmcase/vaccine-order-optimizer
+```
 
 The swagger looks like:
 
