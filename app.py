@@ -1,8 +1,11 @@
+from server.infrastructure.DataStore import DataStore
 from flask import Flask, redirect, abort, Response, Blueprint
 from flasgger import Swagger
 import os, time, json
 from datetime import datetime
 import logging
+
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -18,19 +21,10 @@ from server.api.prometheus import metrics_bp
 from server.infrastructure.ReeferConsumer import ReeferConsumer
 from server.infrastructure.InventoryConsumer import InventoryConsumer
 from server.infrastructure.TransportationConsumer import TransportationConsumer
-from server.domain.Orders import Orders
-from server.infrastructure.DataProducer import DataProducer
-from server.infrastructure.DataStore import DataStore
 
 
 # Flask configuration
 app = Flask(__name__)
-
-#  Keep current orders
-orders = Orders()
-# Create the data producer
-data_producer = DataProducer()
-dataStore = DataStore.getInstance()
 
 
 app.register_blueprint(orders_blueprint)
@@ -41,12 +35,12 @@ app.register_blueprint(data_transportation_blueprint)
 app.register_blueprint(health_bp)
 app.register_blueprint(metrics_bp)
 
-
+DataStore.getInstance()
 
 # Create the consumer instances
-reefer_consumer = ReeferConsumer(dataStore)
-transportation_consumer = TransportationConsumer(dataStore)
-inventory_consumer = InventoryConsumer(dataStore)
+reefer_consumer = ReeferConsumer()
+transportation_consumer = TransportationConsumer()
+inventory_consumer = InventoryConsumer()
 
 
 
@@ -67,7 +61,7 @@ swagger_template = {
       "email": "boyerje@us.ibm.com",
       "url": "https://ibm-cloud-architecture.github.io",
     },
-    "version": "0.2"
+    "version": os.getenv("APP_VERSION","0.0.3")
   },
   "schemes": [
     "http"

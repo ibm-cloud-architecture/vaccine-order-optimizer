@@ -4,8 +4,9 @@ metadata:
   name: vaccine-oro-cm
   namespace: vaccine
 data:
-  brokers: gse-eda-dev-kafka-bootstrap-eventstreams.gse-eda-2020-10-3-0143c5dd31acd8e030a1d6e0ab1380e3-0000.us-east.containers.appdomain.cloud:443
-  inventoryTopic: vaccine-inventory
-  reeferTopic: vaccine-reefer
-  transportationTopic: vaccine-transportation
-  app-version: v0.0.2
+  KAFKA_BROKERS: gse-eda-dev-kafka-bootstrap-eventstreams.eventstreams.svc:9093
+  INVENTORY_TOPIC: vaccine-inventory
+  TRANSPORTATION_TOPIC: vaccine-transportation
+  REEFER_TOPIC: vaccine-reefer
+  APP_VERSION: v0.0.3
+  CONSUMER_GRP: vaccine-optimizer

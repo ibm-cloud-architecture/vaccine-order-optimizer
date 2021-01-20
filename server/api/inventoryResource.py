@@ -23,7 +23,7 @@ class DataInventory(Resource):
     def get(self):
         print('[DataInventoryResource] - calling /api/v1/data/inventory endpoint')
         ds = DataStore.getInstance()
-        return ds.getAllLotInventory(),202
+        return ds.getAllLotInventory(),202, {'Content-Type' : 'application/json'}
 
 class DataInventoryPandas(Resource):  
 

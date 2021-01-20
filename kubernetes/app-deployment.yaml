@@ -58,44 +58,22 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: vaccine-oro-cm
         env:
-          - name: APP_VERSION
-            valueFrom:
-              configMapKeyRef:
-                key: app-version
-                name: vaccine-oro-cm
           - name: SCHEMA_REGISTRY_URL
             valueFrom:
               secretKeyRef:
                 key: SCHEMA_REGISTRY_URL
                 name: vaccine-oro-secrets
-          - name: KAFKA_BROKERS
-            valueFrom:
-              configMapKeyRef:
-                key: brokers
-                name: vaccine-oro-cm
-          - name: REEFER_TOPIC
-            valueFrom:
-              configMapKeyRef:
-                key: reeferTopic
-                name: vaccine-oro-cm
-          - name: INVENTORY_TOPIC
-            valueFrom:
-              configMapKeyRef:
-                key: inventoryTopic
-                name: vaccine-oro-cm
-          - name: TRANSPORTATION_TOPIC
-            valueFrom:
-              configMapKeyRef:
-                key: transportationTopic
-                name: vaccine-oro-cm
           - name: KAFKA_USER
-            value: jesus-dev
+            value: vacc-user 
           - name: KAFKA_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: password
-                name: jesus-dev
+                name: vacc-user 
           - name: KAFKA_CERT
             value: "/app/certs/es-cert.pem"
           - name: PYTHONUNBUFFERED

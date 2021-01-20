@@ -1,18 +1,3 @@
+source ./scripts/setenv.sh
 
-if [[ $# -eq 0 ]];then
-  kcenv="LOCAL"
-else
-  kcenv=$1
-fi
-source ./scripts/setenv.sh $kcenv
-
-if [[ $kcenv == "LOCAL" ]]
-then
-  docker run  -v $(pwd):/home -e KAFKA_BROKERS=$KAFKA_BROKERS \
-     --network kafkanet \
-      -ti ibmcase/python37 bash
-else
-  docker run  -v $(pwd):/home -e KAFKA_BROKERS=$KAFKA_BROKERS \
-     -e KAFKA_APIKEY=$KAFKA_APIKEY -e KAFKA_CERT=$KAFKA_CERT\
-      -ti ibmcase/python37  bash
-fi
+docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL -e REEFER_TOPIC=$REEFER_TOPIC -e INVENTORY_TOPIC=$INVENTORY_TOPIC -e TRANSPORTATION_TOPIC=$TRANSPORTATION_TOPIC -e KAFKA_USER=$KAFKA_USER -e KAFKA_PASSWORD=$KAFKA_PASSWORD -e KAFKA_CERT=$KAFKA_CERT -e APP_VERSION=$APP_VERSION -p 5000:5000  -v $(pwd):/app ibmcase/vaccine-order-optimizer bash

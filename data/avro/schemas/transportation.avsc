@@ -1,13 +1,13 @@
 {   
-    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
     "doc": "Avro data schema for transportation events",
     "type":"record",
-    "name":"transportation",
+    "name":"Transportation",
     "fields":[
             {
                 "name": "lane_id",
                 "type": "string",
-                "doc": "Inventory lot ID"
+                "doc": "Lane ID"
             },
             {
                 "name": "from_loc",

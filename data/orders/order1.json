@@ -1,0 +1,9 @@
+{
+    "deliveryLocation": "London, Britanny",
+    "order_id": "VO003",
+    "priority": 2,
+    "quantity": 150,
+    "deliveryDate": "01/12/2021",
+    "vaccineType": "covid19",
+    "askingOrganization" : "UK governement"
+}

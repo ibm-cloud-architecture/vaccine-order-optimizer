@@ -34,16 +34,19 @@ docker push ibmcase/vaccine-order-optimizer
 The repository include a [github action workflow](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/.github/workflows/dockerbuild.yaml) to build and push the image automatically to the [public docker registry.](https://hub.docker.com/repository/docker/ibmcase/vaccine-order-optimizer)
 
 The flow uses a set of secrets in the git repo:
+
 * DOCKER_IMAGE_NAME = vaccine-order-optimizer
 * DOCKER_REPOSITORY = ibmcase
 * DOCKER_USERNAME and DOCKER_PASSWORD
 
 ## Run locally
 
+To run the application locally but remote connected to kafka deployed on OpenShift do the following:
+
 * Get the Kafka URL, schema registry URL, the user and password and any pem file containing the server certificate.
 * The certificate needs to be under certs folder.
 * Copy the script/setenv-tmpl.sh  to script/setenv.sh
-* modify the environment variables.
+* Modify the environment variables.
 
 ```shell
 source ./script/setenv.sh
@@ -54,6 +57,12 @@ docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_RE
 The swagger looks like:
 
 ![](./docs/images/oro-swagger.png)
+
+If you want to run this image and be able to continuously update the code, run the docker container with:
+
+```shell
+docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL -e REEFER_TOPIC=$REEFER_TOPIC -e INVENTORY_TOPIC=$INVENTORY_TOPIC -e TRANSPORTATION_TOPIC=$TRANSPORTATION_TOPIC -e KAFKA_USER=$KAFKA_USER -e KAFKA_PASSWORD=$KAFKA_PASSWORD -e KAFKA_CERT=$KAFKA_CERT -p 5000:5000  -v ${pwd}:/app ibmcase/vaccine-order-optimizer bash
+```
 
 ## Deploy to OpenShift
 
@@ -123,4 +132,24 @@ They are used in the Deployment configuration as:
       secretKeyRef:
         key: password
         name: eventstreams-cred
+ ```
+
+* Deploy the application using: `oc apply -f kubernetes/app-deployment.yaml`
+*  get the routes to the external exposed URL:
+
+ ```shell
+  oc describe routes vaccine-order-optimizer 
+ ```
+ 
+* Validate the swagger by accessing the route: `http://vaccine-order-optimizer-vaccine......cloud/apidocs/`
+* Trigger the data loading with the operation:
+ 
+ ```
+ curl -X POST  http://vaccine-order-optimizer-vaccine......cloud/api/v1/optimize/loadData"
+ ```
+
+* Send a new order
+
+ ```
+ curl -X POST -H "Content-Type: application/json" http://vaccine-order-optimizer-vaccine......cloud/    --data "@./data/order1.json"
  ```

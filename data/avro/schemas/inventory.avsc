@@ -1,8 +1,8 @@
 {   
-    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
     "doc": "Avro data schema for inventory events",
     "type":"record",
-    "name":"inventory",
+    "name":"Inventory",
     "fields":[
             {
                 "name": "lot_id",

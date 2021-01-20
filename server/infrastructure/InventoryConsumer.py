@@ -2,6 +2,7 @@ import json, threading, time
 from server.infrastructure.kafka.KafkaAvroConsumer import KafkaAvroConsumer
 import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 import server.infrastructure.kafka.avroUtils as avroUtils
+from server.infrastructure.DataStore import DataStore
 
 class InventoryConsumer:
     """ 
@@ -9,13 +10,12 @@ class InventoryConsumer:
     to consume events about vaccine lots manufactured 
     """
     
-    def __init__(self,dataStore):
+    def __init__(self):
         print("[InventoryConsumer] - Initializing the consumer")
-        self.dataStore = dataStore
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
         self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
                                         EventBackboneConfig.getInventoryTopicName(),
-                                        "InventoryConsumer", False)
+                                        EventBackboneConfig.getConsumerGroup(), False)
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
@@ -28,5 +28,5 @@ class InventoryConsumer:
             if event is not None:
                 print('[InventoryConsumer] - New event consumed: ' + json.dumps(event.value()))
                 event_json = event.value()['data']
-                self.dataStore.addInventory(event.key(),event_json)
+                DataStore.getInstance().addLotToInventory(event.key(),event_json)
                 

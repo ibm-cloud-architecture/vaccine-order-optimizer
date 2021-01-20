@@ -15,7 +15,7 @@ RDD_PENALTY_LATE = 10
 UNMET_ORDER_PENALTY = 50
 
 Lane = namedtuple("Lane", ['lane_id', 'from_loc', 'to_loc', 'transit_time', 'reefer_cost', 'fixed_cost'])
-Order = namedtuple('Order', ['order_id', 'destination', 'qty', 'rdd', 'priority'])
+Order = namedtuple('Order', ['order_id', 'deliveryLocation', 'qty', 'rdd', 'priority'])
 
 class VaccineOrderOptimizer(object):
     ''' Vaccine Order Optimizer: 
@@ -95,8 +95,8 @@ class VaccineOrderOptimizer(object):
         self.data['TRANSPORTATION'] = transportation
 
         self.data['ORDERS'] = orders
-        self.data['ORDERS']['request_delivery_date'] = self.data['ORDERS']['request_delivery_date'].replace(r'^\s*$', np.nan, regex=True)
-        self.data['ORDERS']['request_delivery_date'] = pd.to_datetime(self.data['ORDERS']['request_delivery_date'], format='%m/%d/%Y')
+        self.data['ORDERS']['deliveryDate'] = self.data['ORDERS']['deliveryDate'].replace(r'^\s*$', np.nan, regex=True)
+        self.data['ORDERS']['deliveryDate'] = pd.to_datetime(self.data['ORDERS']['deliveryDate'], format='%m/%d/%Y')
 
         self.process_data()
 
@@ -155,12 +155,12 @@ class VaccineOrderOptimizer(object):
         '''
         self.orders = {}
         for _, rec in self.data['ORDERS'].iterrows(): 
-            if pd.isnull(rec['request_delivery_date']) or rec['request_delivery_date'].date() <= self.start_date: 
+            if pd.isnull(rec['deliveryDate']) or rec['deliveryDate'].date() <= self.start_date: 
                 rdd = 1     # Default to day 1
             else: 
-                rdd = (rec['request_delivery_date'].date() - self.start_date).days
+                rdd = (rec['deliveryDate'].date() - self.start_date).days
 
-            loc = rec['destination']
+            loc = rec['deliveryLocation']
             if loc in self.customer_locs: 
                 self.orders[rec['order_id']] = Order(rec['order_id'], loc, int(rec['quantity']), rdd, rec['priority'])
             else: 
@@ -208,7 +208,7 @@ class VaccineOrderOptimizer(object):
                         if (s1,s2) in self.lanes and d+self.lanes[(s1,s2)].transit_time<=self.plan_horizon and s1!=s2}
         # Set of arcs from customers to orders
         self.A_CO = {((c,d1), (o,d2)) for (c,d1) in self.N_C for (o,d2) in self.N_O 
-                        if c==self.orders[o].destination and d1>=d2-RDD_WIN_PRE and d1<=d2+RDD_WIN_AFT}
+                        if c==self.orders[o].deliveryLocation and d1>=d2-RDD_WIN_PRE and d1<=d2+RDD_WIN_AFT}
         # Set of arcs from customers to suppliers (for reefer relocation)
         self.A_CS = {((c,d), (s,d+self.lanes[(c,s)].transit_time)) for (c,d) in self.N_C for s in self.supplier_locs
                         if (c,s) in self.lanes and d+self.lanes[(c,s)].transit_time<=self.plan_horizon}
@@ -383,7 +383,7 @@ class VaccineOrderOptimizer(object):
         rec_orders = []
         for o in deliveries: 
             order_id = o[0]
-            dest = self.orders[order_id].destination
+            dest = self.orders[order_id].deliveryLocation
             order_qty = self.orders[order_id].qty
             priority = self.orders[order_id].priority
             rdd = self.get_date(self.orders[order_id].rdd)
@@ -394,7 +394,7 @@ class VaccineOrderOptimizer(object):
             rem = self.sol_w[o] if o in self.sol_w else 0
             rec_orders.append([order_id, dest, order_qty, priority, rdd, min_dt, max_dt, del_cnt, del_qty, rem])
 
-        self.plan_orders = pd.DataFrame(rec_orders, columns=['Order ID', 'Destination', 'Order Qty', 'Order Priority', 'Order RDD', 
+        self.plan_orders = pd.DataFrame(rec_orders, columns=['Order ID', 'DeliveryLocation', 'Order Qty', 'Order Priority', 'Order RDD', 
                                                              'First Delivery', 'Last Delivery', 'Number of Deliveries', 'Delivered Qty', 'Remaining Qty'])
         self.plan_orders.sort_values(['Order ID'], inplace=True)
 

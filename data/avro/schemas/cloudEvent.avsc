@@ -1,8 +1,8 @@
 {   
-    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
     "doc": "Avro data schema for Vaccine Order Optimizer events",
     "type":"record",
-    "name":"vaccineOrderOptimizerEvent",
+    "name":"VaccineOrderCloudEvent",
     "fields":[
             {
                 "name": "type",
@@ -41,7 +41,9 @@
             },
             {
                 "name": "data",
-                "type": ["ibm.com.vaccine.orderoptimizer.inventory","ibm.com.vaccine.orderoptimizer.reefer","ibm.com.vaccine.orderoptimizer.transportation"],
+                "type": ["ibm.gse.eda.vaccine.orderoptimizer.Inventory",
+                         "ibm.gse.eda.vaccine.orderoptimizer.Reefer",
+                         "ibm.gse.eda.vaccine.orderoptimizer.Transportation"],
                 "doc": "The event"
             }
     ]

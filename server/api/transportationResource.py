@@ -22,7 +22,8 @@ class TransportationResource(Resource):
     @swag_from('transportationAPI.yml')
     def get(self):
         print('[TransportationResource] - calling /api/v1/data/transportation endpoint')
-        ds = DataStore.getInstance()
-        return ds.getAllTransportations(),202
+        list = DataStore.getInstance().getAllTransportations()
+        print(list)
+        return list,202
 
 api.add_resource(TransportationResource, "/api/v1/data/transportation")

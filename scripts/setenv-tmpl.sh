@@ -13,7 +13,7 @@ export SCHEMA_REGISTRY_URL=
 # Set these if you are using Event Streams on prem or on IBM Cloud
 export KAFKA_USER=""
 export KAFKA_PASSWORD=""
-
+export APP_VERSION=v0.0.3
 #########
 ## OCP ##
 #########

@@ -17,7 +17,7 @@ class DataProducer:
         # Get the events Avro data schemas location
         self.schemas_location = "/app/data/avro/schemas/"
         # self.cloudEvent_schema = self.inventory_schema = avroUtils.getCloudEventSchema(self.schemas_location,"cloudEvent.avsc","inventory.avsc","reefer.avsc","transportation.avsc")
-        self.cloudEvent_schema = self.inventory_schema = avroUtils.getCloudEventSchema()
+        self.cloudEvent_schema = avroUtils.getCloudEventSchema()
         # Build the Kafka Avro Producers
         self.kafkaproducer_inventory = KafkaAvroProducer(json.dumps(self.cloudEvent_schema.to_json()),"VOO-Inventory")
         self.kafkaproducer_reefer = KafkaAvroProducer(json.dumps(self.cloudEvent_schema.to_json()),"VOO-Reefer")
@@ -35,12 +35,12 @@ class DataProducer:
                 lines = [line.rstrip() for line in f]
             for event in lines:
                 event_json = {}
-                event_json['type'] = "ibm.com.vaccine.orderoptimizer.vaccineOrderOptimizerEvent"
+                event_json['type'] = "ibm.gse.eda.vaccine.orderoptimizer.VaccineOrderCloudEvent"
                 event_json['specversion'] = "1.0"
                 event_json['source'] = "Vaccine Order Optimizer producer endpoint"
                 event_json['id'] = str(uuid.uuid4())
                 event_json['time'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                event_json['dataschema'] = "https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/data/avro/schemas/cloudEvent.avsc"
+                event_json['dataschema'] = "https://raw.githubusercontent.com/ibm-cloud-architecture/vaccine-order-optimizer/master/data/avro/schemas/Inventory.avsc"
                 event_json['datacontenttype'] =	"application/json"
                 event_json['data'] = json.loads(event)
                 # We might want to publish events with the inventory 'lot_id' field as the key for better partitioning
@@ -56,12 +56,12 @@ class DataProducer:
                 lines = [line.rstrip() for line in f]
             for event in lines:
                 event_json = {}
-                event_json['type'] = "ibm.com.vaccine.orderoptimizer.vaccineOrderOptimizerEvent"
+                event_json['type'] = "ibm.gse.eda.vaccine.orderoptimizer.VaccineOrderCloudEvent"
                 event_json['specversion'] = "1.0"
                 event_json['source'] = "Vaccine Order Optimizer producer endpoint"
                 event_json['id'] = str(uuid.uuid4())
                 event_json['time'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                event_json['dataschema'] = "https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/data/avro/schemas/cloudEvent.avsc"
+                event_json['dataschema'] = "https://raw.githubusercontent.com/ibm-cloud-architecture/vaccine-order-optimizer/master/data/avro/schemas/Reefer.avsc"
                 event_json['datacontenttype'] =	"application/json"
                 event_json['data'] = json.loads(event)
                 # We might want to publish events with the reefer 'reefer_id' field as the key for better partitioning
@@ -77,12 +77,12 @@ class DataProducer:
                 lines = [line.rstrip() for line in f]
             for event in lines:
                 event_json = {}
-                event_json['type'] = "ibm.com.vaccine.orderoptimizer.vaccineOrderOptimizerEvent"
+                event_json['type'] = "ibm.gse.eda.vaccine.orderoptimizer.VaccineOrderCloudEvent"
                 event_json['specversion'] = "1.0"
                 event_json['source'] = "Vaccine Order Optimizer producer endpoint"
                 event_json['id'] = str(uuid.uuid4())
                 event_json['time'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-                event_json['dataschema'] = "https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/data/avro/schemas/cloudEvent.avsc"
+                event_json['dataschema'] = "https://raw.githubusercontent.com/ibm-cloud-architecture/vaccine-order-optimizer/master/data/avro/schemas/Transportation.avsc"
                 event_json['datacontenttype'] =	"application/json"
                 event_json['data'] = json.loads(event)
                 # We might want to publish events with the transportation 'lane_id' field as the key for better partitioning

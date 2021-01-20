@@ -1,8 +1,8 @@
 {   
-    "namespace": "ibm.com.vaccine.orderoptimizer",
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
     "doc": "Avro data schema for Reefer events",
     "type":"record",
-    "name":"reefer",
+    "name":"Reefer",
     "fields":[
             {
                 "name": "reefer_id",

@@ -3,7 +3,7 @@ from flask import Blueprint, Response
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.api.prometheus import track_requests
-from server.infrastructure.DataStore import DataStore
+from server.infrastructure.ReeferDataStore import ReeferDataStore
 
 """
  created a new instance of the Blueprint class and bound the DataReefer and DataReeferPandas resources to it.
@@ -21,8 +21,7 @@ class ReeferResource(Resource):
     @track_requests
     @swag_from('reeferAPI.yml')
     def get(self):
-        print('[DataReeferResource] - calling /api/v1/data/reefer endpoint')
-        ds = DataStore.getInstance()
-        return ds.getAllReefers(),202
+        print('[ReeferResource] - calling /api/v1/data/reefer endpoint')
+        return  ReeferDataStore.getInstance().getAllReefers(),202
 
 api.add_resource(ReeferResource, "/api/v1/data/reefer")

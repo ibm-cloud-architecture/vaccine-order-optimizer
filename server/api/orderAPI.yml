@@ -25,13 +25,17 @@ definitions:
         properties:
             order_id:
                 type: string
-            destination:
+            deliveryLocation:
+                type: string
+            vaccineType:
+                type: string
+            askingOrganization:
                 type: string
             quantity:
                 type: integer
                 minimum: 1
                 maximum: 100000
-            request_delivery_date: 
+            deliveryDate: 
                 type: string
             priority:
                 type: integer
@@ -41,7 +45,9 @@ definitions:
             - order_id
         example:
             order_id: VO001
-            destination: Paris, France
+            deliveryLocation: Paris, France
             quantity: 300
-            request_delivery_date: 7/12/2020
+            deliveryDate: 7/12/2020
             priority: 10
+            vaccineType: covid19
+            askingOrganization: French governement
