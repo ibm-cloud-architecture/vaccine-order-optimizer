@@ -4,7 +4,7 @@ import logging, json
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.api.prometheus import track_requests
-from server.infrastructure.DataStore import DataStore
+from server.infrastructure.OrderDataStore import OrderDataStore
 
 """
  created a new instance of the Blueprint class and bound the NewOrder resource to it.
@@ -27,7 +27,7 @@ class OrderResource(Resource):
         print('[OrderResource] - Order object ' + json.dumps(order_json))
         # TBD: Do some data validation so that we make sure the order comes with the attributes and values we expect
         # Process order and add it to the existing orders
-        DataStore.getInstance().processOrder(order_json['order_id'],order_json)
+        OrderDataStore.getInstance().processOrder(order_json['order_id'],order_json)
         return "New order processed", 202
     
     @track_requests
@@ -56,6 +56,6 @@ class OrderResource(Resource):
                                 }
         """
         print('[OrderResource] - calling /api/v1/orders endpoint')
-        return DataStore.getInstance().getOrders(),202
+        return OrderStore.getInstance().getOrders(),202
 
 api.add_resource(OrderResource, "/api/v1/orders")

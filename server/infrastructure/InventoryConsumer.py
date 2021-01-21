@@ -2,7 +2,8 @@ import json, threading, time
 from server.infrastructure.kafka.KafkaAvroConsumer import KafkaAvroConsumer
 import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 import server.infrastructure.kafka.avroUtils as avroUtils
-from server.infrastructure.DataStore import DataStore
+from server.infrastructure.InventoryDataStore import InventoryDataStore
+import logging
 
 class InventoryConsumer:
     """ 
@@ -11,22 +12,23 @@ class InventoryConsumer:
     """
     
     def __init__(self):
-        print("[InventoryConsumer] - Initializing the consumer")
+        logging.debug("[InventoryConsumer] - Initializing the consumer")
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
+        self.store = InventoryDataStore.getInstance()
         self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
                                         EventBackboneConfig.getInventoryTopicName(),
                                         EventBackboneConfig.getConsumerGroup(), False)
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
-        print("[InventoryConsumer] - Starting to consume Events")
+        logging.debug("[InventoryConsumer] - Starting to consume Events")
         x.start()
     
-    def processEvents(self):
+    def processEvents(self):   
         while True:
             event = self.kafkaconsumer.pollNextRawEvent()
             if event is not None:
-                print('[InventoryConsumer] - New event consumed: ' + json.dumps(event.value()))
+                logging.debug('[InventoryConsumer] - New event consumed: ' + json.dumps(event.value()))
                 event_json = event.value()['data']
-                DataStore.getInstance().addLotToInventory(event.key(),event_json)
+                self.store.addLotToInventory(event.key(),event_json)
                 

@@ -1,4 +1,3 @@
-from server.infrastructure.DataStore import DataStore
 from flask import Flask, redirect, abort, Response, Blueprint
 from flasgger import Swagger
 import os, time, json
@@ -35,7 +34,6 @@ app.register_blueprint(data_transportation_blueprint)
 app.register_blueprint(health_bp)
 app.register_blueprint(metrics_bp)
 
-DataStore.getInstance()
 
 # Create the consumer instances
 reefer_consumer = ReeferConsumer()

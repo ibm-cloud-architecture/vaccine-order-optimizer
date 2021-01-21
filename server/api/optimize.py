@@ -10,7 +10,11 @@ from server.infrastructure import ReeferConsumer as reefer_consumer
 from server.infrastructure import InventoryConsumer as inventory_consumer
 from server.infrastructure import TransportationConsumer as transportation_consumer
 from server.infrastructure.DataProducer import DataProducer
-from server.infrastructure.DataStore import DataStore
+from server.infrastructure.OrderDataStore import OrderDataStore
+from server.infrastructure.TransportationDataStore import TransportationDataStore
+from server.infrastructure.ReeferDataStore import ReeferDataStore
+from server.infrastructure.InventoryDataStore import InventoryDataStore
+
 from datetime import date
 """
  created a new instance of the Blueprint class and bound the NewOrder resource to it.
@@ -38,10 +42,10 @@ class Optimize(Resource):
         # Create the optimizer
         optimizer = VaccineOrderOptimizer(
             start_date=date(2020, 9, 1), debug=False)
-        optimizer.prepare_data(DataStore.getInstance().getOrdersAsPanda(),
-                               DataStore.getInstance().getAllReefersAsPanda(),
-                               DataStore.getInstance().getAllLotInventoryAsPanda(),
-                               DataStore.getInstance().getAllTransportationsAsPanda())
+        optimizer.prepare_data(OrderDataStore.getInstance().getOrdersAsPanda(),
+                               ReeferDataStore.getInstance().getAllReefersAsPanda(),
+                               InventoryDataStore.getInstance().getAllLotInventoryAsPanda(),
+                               TransportationDataStore.getInstance().getAllTransportationsAsPanda())
         optimizer.optimize()
 
         # Get the optimization solution

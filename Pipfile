@@ -17,6 +17,7 @@ avro-python3 = "==1.10.0"
 cloudevents = "==1.2.0"
 fastavro = "==1.0.0.post1"
 prometheus_client = "*"
+requests = "*"
 
 [requires]
 python_version = "3.7"

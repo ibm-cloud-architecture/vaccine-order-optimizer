@@ -3,7 +3,8 @@ from flask import Blueprint, Response
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.api.prometheus import track_requests
-from server.infrastructure.DataStore import DataStore
+from server.infrastructure.TransportationDataStore import TransportationDataStore
+import logging
 
 """
  created a new instance of the Blueprint class and bound the DataTransportation and DataTransportationPandas resources to it.
@@ -17,13 +18,16 @@ api = Api(data_transportation_blueprint)
 
 class TransportationResource(Resource):  
 
+    def __init__(self):
+        self.store = TransportationDataStore.getInstance()
+
     # Returns the Transportation data in JSON format
     @track_requests
     @swag_from('transportationAPI.yml')
     def get(self):
-        print('[TransportationResource] - calling /api/v1/data/transportation endpoint')
-        list = DataStore.getInstance().getAllTransportations()
+        logging.debug('[TransportationResource] - calling /api/v1/data/transportations endpoint')
+        list = self.store.getAllTransportations()
         print(list)
         return list,202
 
-api.add_resource(TransportationResource, "/api/v1/data/transportation")
+api.add_resource(TransportationResource, "/api/v1/data/transportations")

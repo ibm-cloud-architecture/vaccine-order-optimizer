@@ -12,6 +12,7 @@ class ReeferConsumer:
     
     def __init__(self):
         print("[ReeferConsumer] - Initializing the consumer")
+        self.store = ReeferDataStore.getInstance()
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
         self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
                                     EventBackboneConfig.getReeferTopicName(),
@@ -23,10 +24,11 @@ class ReeferConsumer:
         x.start()
     
     def processEvents(self):
+        
         while True:
             event = self.kafkaconsumer.pollNextRawEvent()
             if event is not None:
-                print('[ReeferConsumer] - New event consumed: ' + json.dumps(event.value()))
+                # print('[ReeferConsumer] - New event consumed: ' + json.dumps(event.value()))
                 event_json = event.value()['data']
-                ReeferDataStore.getInstance().addReefer(event.key(),event_json)
+                self.store.addReefer(event.key(),event_json)
  

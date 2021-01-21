@@ -4,6 +4,7 @@ from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.api.prometheus import track_requests
 from server.infrastructure.ReeferDataStore import ReeferDataStore
+import logging
 
 """
  created a new instance of the Blueprint class and bound the DataReefer and DataReeferPandas resources to it.
@@ -17,11 +18,16 @@ api = Api(data_reefer_blueprint)
 
 class ReeferResource(Resource):  
 
+    def __init__(self):
+        self.store = ReeferDataStore.getInstance()
+
     # Returns the Reefer data in JSON format
     @track_requests
     @swag_from('reeferAPI.yml')
     def get(self):
-        print('[ReeferResource] - calling /api/v1/data/reefer endpoint')
-        return  ReeferDataStore.getInstance().getAllReefers(),202
+        logging.debug('[ReeferResource] - calling /api/v1/data/reefers endpoint')
+        list = self.store.getAllReefers()
+        logging.debug(list)
+        return  list,200,  {'Content-Type' : 'application/json'}
 
-api.add_resource(ReeferResource, "/api/v1/data/reefer")
+api.add_resource(ReeferResource, "/api/v1/data/reefers")

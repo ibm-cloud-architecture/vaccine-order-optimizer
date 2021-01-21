@@ -1,21 +1,24 @@
 import pandas as pd
 
 class ReeferDataStore():
-    reefers = {}
+    
     instance = None
 
     @classmethod
     def getInstance(cls):
         if cls.instance == None:
             cls.instance = ReeferDataStore()
+        print(cls.instance)
         return cls.instance 
 
     def __init__(self):
-        pass
+        self.reefers = {}
+        print(" ReeferDataStore ctr called")
 
 
     def getAllReefers(self):
         jsonArray = []
+        print(str(self.reefers))
         for key,value in self.reefers.items():
             jsonArray.append(value)
         return jsonArray
@@ -24,6 +27,6 @@ class ReeferDataStore():
         return pd.DataFrame.from_dict(self.reefers)
 
     def addReefer(self,key,reefer):
-        print("add " + key + " " + str(reefer))
+        print("addReefer " + key + " " + str(reefer) + " to " + str(self))
         self.reefers[key]=reefer
 
