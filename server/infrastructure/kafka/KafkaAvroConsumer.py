@@ -5,6 +5,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 from confluent_kafka.serialization import StringDeserializer
 
+POLL_TIMEOUT=5.0
 
 class KafkaAvroConsumer:
 
@@ -113,7 +114,7 @@ class KafkaAvroConsumer:
     # Polls for next event
     def pollNextEvent(self):
         # Poll for messages
-        msg = self.consumer.poll(timeout=10.0)
+        msg = self.consumer.poll(timeout=POLL_TIMEOUT)
         anEvent = {}
         # Validate the returned message
         if msg is None:
@@ -130,77 +131,27 @@ class KafkaAvroConsumer:
             self.traceResponse(msg)
         return msg.value()
 
-    # Polls for events until it finds an event where keyId=keyname
-    def pollNextEventKeyIdKeyName(self, keyID, keyname):
-        gotIt = False
-        while not gotIt:
-            msg = self.consumer.poll(timeout=10.0)
-            # Continue if we have not received a message yet
-            if msg is None:
-                continue
-            if msg.error():
-                print("[KafkaAvroConsumer] - [ERROR] - Consumer error: {}".format(msg.error()))
-                # Stop reading if we find end of partition in the error message
-                if ("PARTITION_EOF" in msg.error()):
-                    gotIt= True
-                continue
-            self.traceResponse(msg)
-            # If we've found our event based on keyname and keyID, stop reading messages
-            if (msg.value()[keyname] == keyID):
-                gotIt = True
-        return msg.value()
-
-    # Polls for events until it finds an event with same key
-    def pollNextEventByKey(self, keyID):
-        if (str(keyID) == ""):
-            print("[KafkaAvroConsumer] - [ERROR] - Consumer error: Key is an empty string")
-            return None
-        gotIt = False
-        while not gotIt:
-            msg = self.consumer.poll(timeout=10.0)
-            # Continue if we have not received a message yet
-            if msg is None:
-                continue
-            if msg.error():
-                print("[KafkaAvroConsumer] - [ERROR] - Consumer error: {}".format(msg.error()))
-                # Stop reading if we find end of partition in the error message
-                if ("PARTITION_EOF" in msg.error()):
-                    gotIt= True
-                continue
-            self.traceResponse(msg)
-            # If we've found our event based on keyname and keyID, stop reading messages
-            if (msg.key() == keyID):
-                gotIt = True
-        return msg.value()
+   
     
     # Polls for the next event but returns the raw event
     def pollNextRawEvent(self):
-        msg = self.consumer.poll(timeout=5.0)
-        if msg is None:
+        records = self.consumer.poll(timeout=POLL_TIMEOUT)
+        if records is None:
             return None
-        if msg.error():
+        if records.error():
             # Stop reading if we find end of partition in the error message
-            if ("PARTITION_EOF" in msg.error()):
+            if ("PARTITION_EOF" in records.error()):
                 return None
             else:
-                print("[KafkaAvroConsumer] - [ERROR] - Consumer error: {}".format(msg.error()))
+                print("[KafkaAvroConsumer] - [ERROR] - Consumer error: {}".format(records.error()))
                 return None
-        return msg
+        else:
+            self.traceResponse(records)
+        return records
 
-    # Polls for events endlessly
-    def pollEvents(self):
-        gotIt = False
-        while not gotIt:
-            msg = self.consumer.poll(timeout=10.0)
-            if msg is None:
-                continue
-            if msg.error():
-                print("[KafkaAvroConsumer] - [ERROR] - Consumer error: {}".format(msg.error()))
-                if ("PARTITION_EOF" in msg.error()):
-                    gotIt= True
-                continue
-            self.traceResponse(msg)
 
+    def commitEvent(self,event):
+        self.consumer.commit(event)
 
     def close(self):
         self.consumer.close()

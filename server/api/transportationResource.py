@@ -11,15 +11,15 @@ import logging
 """
 
 data_transportation_blueprint = Blueprint("data_transportation", __name__)
-api = Api(data_transportation_blueprint)
+transportApi = Api(data_transportation_blueprint)
 
 # The python-flask stack includes the prometheus metrics engine. You can ensure your endpoints
 # are included in these metrics by enclosing them in the @track_requests wrapper.
 
 class TransportationResource(Resource):  
 
-    def __init__(self):
-        self.store = TransportationDataStore.getInstance()
+    def __init__(self,transportationStore):
+        self.store = transportationStore
 
     # Returns the Transportation data in JSON format
     @track_requests
@@ -29,5 +29,3 @@ class TransportationResource(Resource):
         list = self.store.getAllTransportations()
         print(list)
         return list,202
-
-api.add_resource(TransportationResource, "/api/v1/data/transportations")

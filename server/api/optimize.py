@@ -21,13 +21,16 @@ from datetime import date
 """
 
 optimize_blueprint = Blueprint("optimize", __name__)
-api = Api(optimize_blueprint)
+optimizerAPI = Api(optimize_blueprint)
 
 
-class Optimize(Resource):
+class OrderOptimizer(Resource):
 
-    def __init__(self) -> None:
+    def __init__(self, inventoryStore, reeferStore, transportationStore) -> None:
         super().__init__()
+        self.inventoryStore = inventoryStore
+        self.reeferStore = reeferStore
+        self.transportationStore = transportationStore
 
     '''
     Expose an optimize API to process an order with existing orders
@@ -43,9 +46,9 @@ class Optimize(Resource):
         optimizer = VaccineOrderOptimizer(
             start_date=date(2020, 9, 1), debug=False)
         optimizer.prepare_data(OrderDataStore.getInstance().getOrdersAsPanda(),
-                               ReeferDataStore.getInstance().getAllReefersAsPanda(),
-                               InventoryDataStore.getInstance().getAllLotInventoryAsPanda(),
-                               TransportationDataStore.getInstance().getAllTransportationsAsPanda())
+                               self.reeferStore.getAllReefersAsPanda(),
+                               self.inventoryStore.getAllLotInventoryAsPanda(),
+                               self.transportationStore.getAllTransportationsAsPanda())
         optimizer.optimize()
 
         # Get the optimization solution
@@ -83,5 +86,5 @@ class ExternalSystemsSimulator(Resource):
         return Response("loaded", 202, {'Content-Type': 'text/plaintext'})
 
 
-api.add_resource(Optimize, "/api/v1/optimize")
-api.add_resource(ExternalSystemsSimulator, "/api/v1/optimize/loadData")
+
+optimizerAPI.add_resource(ExternalSystemsSimulator, "/api/v1/optimize/loadData")

@@ -21,7 +21,7 @@ def isCertificateSecured():
     return os.path.isfile(KAFKA_CERT)
 
 def getKafkaCertificate():
-    return os.getenv('KAFKA_CERT','/certs/es-cert.pem')
+    return os.getenv('KAFKA_CERT','/app/certs/es-cert.pem')
 
 def getReeferTopicName():
     return os.getenv("REEFER_TOPIC","vaccine-reefer")
@@ -33,4 +33,4 @@ def getTransportationTopicName():
     return os.getenv("TRANSPORTATION_TOPIC","vaccine-transportation")
 
 def getConsumerGroup():
-    return os.getenv("CONSUMER_GRP","vaccine-optimizer")
+    return os.getenv("CONSUMER_GROUP","vaccine-optimizer")

@@ -1,4 +1,5 @@
 import pandas as pd
+import logging
 
 class ReeferDataStore():
     
@@ -18,7 +19,7 @@ class ReeferDataStore():
 
     def getAllReefers(self):
         jsonArray = []
-        print(str(self.reefers))
+        logging.info(str(self.reefers))
         for key,value in self.reefers.items():
             jsonArray.append(value)
         return jsonArray
@@ -27,6 +28,6 @@ class ReeferDataStore():
         return pd.DataFrame.from_dict(self.reefers)
 
     def addReefer(self,key,reefer):
-        print("addReefer " + key + " " + str(reefer) + " to " + str(self))
+        logging.info("addReefer " + key + " " + str(reefer) + " to " + str(self))
         self.reefers[key]=reefer
 

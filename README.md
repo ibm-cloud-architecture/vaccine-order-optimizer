@@ -135,7 +135,7 @@ They are used in the Deployment configuration as:
  ```
 
 * Deploy the application using: `oc apply -f kubernetes/app-deployment.yaml`
-*  get the routes to the external exposed URL:
+* Get the routes to the external exposed URL:
 
  ```shell
   oc describe routes vaccine-order-optimizer 
@@ -144,12 +144,12 @@ They are used in the Deployment configuration as:
 * Validate the swagger by accessing the route: `http://vaccine-order-optimizer-vaccine......cloud/apidocs/`
 * Trigger the data loading with the operation:
  
- ```
+ ```shell
  curl -X POST  http://vaccine-order-optimizer-vaccine......cloud/api/v1/optimize/loadData"
  ```
 
 * Send a new order
 
- ```
+ ```shell
  curl -X POST -H "Content-Type: application/json" http://vaccine-order-optimizer-vaccine......cloud/    --data "@./data/order1.json"
  ```
