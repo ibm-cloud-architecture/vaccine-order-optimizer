@@ -9,6 +9,7 @@ verify_ssl = true
 Flask = ">=1.1.1"
 flask-restful = ">=0.3.8"
 flasgger = ">=0.9.5"
+jsonschema = "<=3.0.0"
 pandas = "*"
 docplex = "==2.15.194"
 cplex = "==12.10.0.3"

@@ -9,5 +9,6 @@ data:
   INVENTORY_TOPIC: vaccine-inventory
   TRANSPORTATION_TOPIC: vaccine-transportation
   REEFER_TOPIC: vaccine-reefer
+  ORDER_TOPIC: vaccine.public.orderevents
   APP_VERSION: v0.0.3
   CONSUMER_GRP: vaccine-optimizer

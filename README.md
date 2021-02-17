@@ -31,7 +31,7 @@ docker build -t ibmcase/vaccine-order-optimizer .
 docker push ibmcase/vaccine-order-optimizer
 ```
 
-The repository include a [github action workflow](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/.github/workflows/dockerbuild.yaml) to build and push the image automatically to the [public docker registry.](https://hub.docker.com/repository/docker/ibmcase/vaccine-order-optimizer)
+The repository includes a [github action workflow](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/.github/workflows/dockerbuild.yaml) to build and push the image automatically to the [public docker registry.](https://hub.docker.com/repository/docker/ibmcase/vaccine-order-optimizer)
 
 The flow uses a set of secrets in the git repo:
 
@@ -113,7 +113,7 @@ docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_RE
  es-cert.pem:  1164 bytes
  ```
 
-* Copy the Kafka user's secret from the e`ventstreams` or Kafka project to the current vaccine project. This secret has two data fields: username and password
+* Copy the Kafka user's secret from the `eventstreams` or Kafka project to the current vaccine project. This secret has two data fields: username and password
 
  ```shell
  oc get secret eventstreams-cred -n eventstreams --export -o yaml | oc apply -f - 

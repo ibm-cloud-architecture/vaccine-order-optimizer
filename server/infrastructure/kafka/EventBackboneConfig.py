@@ -32,5 +32,7 @@ def getInventoryTopicName():
 def getTransportationTopicName():
     return os.getenv("TRANSPORTATION_TOPIC","vaccine-transportation")
 
+def getOrderTopicName():
+    return os.getenv("ORDER_TOPIC","vaccine.public.orderevents")
 def getConsumerGroup():
     return os.getenv("CONSUMER_GROUP","vaccine-optimizer")

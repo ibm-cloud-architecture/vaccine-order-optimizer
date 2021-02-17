@@ -1,0 +1,28 @@
+{
+    "before": null,
+    "after": {
+        "id": "d60f6a37-b306-4a37-a6b4-9d8703a8a10c",
+        "aggregatetype": "VaccineOrderEntity",
+        "aggregateid": "15",
+        "type": "OrderCreated",
+        "timestamp": 1613525616775908,
+        "payload": "{\"orderID\":15,\"deliveryLocation\":\"Tokyo\",\"quantity\":150,\"priority\":2,\"deliveryDate\":\"2021-02-17\",\"askingOrganization\":\"Japan\",\"vaccineType\":\"COVID-19\",\"status\":\"OPEN\",\"creationDate\":\"17-Feb-2021 01:33:36\"}",
+        "tracingspancontext": "#Wed Feb 17 01:33:36 GMT 2021\nuber-trace-id=6f96f8ded02d0b9b\\:a7e956e435ff0d24\\:6f96f8ded02d0b9b\\:0\n"
+    },
+    "source": {
+        "version": "1.4.0.Final",
+        "connector": "postgresql",
+        "name": "vaccine",
+        "ts_ms": 1613527878253,
+        "snapshot": "last",
+        "db": "postgres",
+        "schema": "public",
+        "table": "orderevents",
+        "txId": 626,
+        "lsn": 24436736,
+        "xmin": null
+    },
+    "op": "r",
+    "ts_ms": 1613527878257,
+    "transaction": null
+}
