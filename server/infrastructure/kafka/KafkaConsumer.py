@@ -1,7 +1,7 @@
 import json,os
 from confluent_kafka import Consumer, KafkaError
 
-POLL_TIMEOUT=5.0
+POLL_TIMEOUT=10.0
 
 class KafkaConsumer:
 
@@ -76,7 +76,6 @@ class KafkaConsumer:
 
     # Polls for next event
     def pollNextEvent(self):
-        # Poll for messages
         msg = self.consumer.poll(timeout=POLL_TIMEOUT)
         # Validate the returned message
         if msg is None:
@@ -89,6 +88,7 @@ class KafkaConsumer:
         else:
             # Print the message
             self.traceResponse(msg)
+        return msg
     
     def close(self):
         self.consumer.close()

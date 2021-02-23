@@ -64,7 +64,11 @@ If you want to run this image and be able to continuously update the code, run t
 docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_REGISTRY_URL -e REEFER_TOPIC=$REEFER_TOPIC -e INVENTORY_TOPIC=$INVENTORY_TOPIC -e TRANSPORTATION_TOPIC=$TRANSPORTATION_TOPIC -e KAFKA_USER=$KAFKA_USER -e KAFKA_PASSWORD=$KAFKA_PASSWORD -e KAFKA_CERT=$KAFKA_CERT -p 5000:5000  -v ${pwd}:/app ibmcase/vaccine-order-optimizer bash
 ```
 
-## Deploy to OpenShift
+## Deploy to OpenShift with Strimzi
+
+The [vaccine-gitops](https://github.com/ibm-cloud-architecture/vaccine-gitops) project includes all the needed Kustomization manifests to deploy Kafka, and the Vaccine Order Optimizer component.
+
+## Deploy to OpenShift with EventStreams as Kafka
 
 * Connect to the vaccine project using: `oc project vaccine`
 * Modify the kubernetes/configmap.yaml with the Kafka Broker URL you are using, and if you changed the topic names too. Then do:

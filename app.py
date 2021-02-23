@@ -1,3 +1,4 @@
+from server.infrastructure.OrderConsumer import OrderConsumer
 from flask import Flask, redirect, abort, Response, Blueprint
 from flasgger import Swagger
 import os, sys
@@ -18,7 +19,7 @@ log.setLevel(logging.ERROR)
 # Import the Blueprints
 from server.api.orderResource import orders_blueprint
 from server.api.optimize import optimize_blueprint, OrderOptimizer, optimizerAPI
-from server.api.inventoryResource import data_inventory_blueprint, inventoryApi,DataInventory,DataInventoryPandas
+from server.api.inventoryResource import data_inventory_blueprint, inventoryApi, DataInventory, DataInventoryPandas
 from server.api.reeferResource import data_reefer_blueprint, reeferApi, ReeferResource
 from server.api.transportationResource import data_transportation_blueprint, transportApi, TransportationResource
 from server.api.health import health_bp
@@ -31,7 +32,7 @@ from server.infrastructure.TransportationConsumer import TransportationConsumer
 
 # Flask configuration
 app = Flask(__name__)
-
+order_consumer = OrderConsumer.getInstance()
 inventory_consumer = InventoryConsumer.getInstance()
 inventoryApi.add_resource(DataInventory, 
           "/api/v1/data/inventory",
@@ -110,4 +111,5 @@ if __name__ == "__main__":
   reefer_consumer.startProcessing()
   transportation_consumer.startProcessing()
   inventory_consumer.startProcessing()
+  order_consumer.startProcessing()
   app.run(debug=True,host='0.0.0.0')
