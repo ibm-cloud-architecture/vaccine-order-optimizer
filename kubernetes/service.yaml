@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vaccine-order-optimizer
+  labels:
+    name: vaccine-order-optimizer
+    app: vaccine-order-optimizer
+spec:
+  ports:
+    - name: web
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+  selector:
+    app: vaccine-order-optimizer
+  type: ClusterIP
+  sessionAffinity: None
+
+          

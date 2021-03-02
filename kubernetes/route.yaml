@@ -1,0 +1,17 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: vaccine-order-optimizer
+  labels:
+    app: vaccine-order-optimizer
+spec:
+  path: /
+  to:
+    kind: Service
+    name: vaccine-order-optimizer
+    weight: 100
+  port:
+    targetPort: 5000
+  wildcardPolicy: None
+
+          
