@@ -1,5 +1,5 @@
 import json, threading, time
-from server.infrastructure.kafka.KafkaConsumer import KafkaConsumer
+from server.infrastructure.kafka.KafkaAvroCDCConsumer import KafkaAvroCDCConsumer
 import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 from server.infrastructure.OrderDataStore import OrderDataStore
 import logging
@@ -22,26 +22,31 @@ class OrderConsumer:
     to consume events about vaccine order coming for the order manager service
     """
     def __init__(self):
-        logging.info("[OrderConsumer] - Initializing the consumer")
+        # logging.info("[OrderConsumer] - Initializing the consumer")
+        print("[OrderConsumer] - Initializing the consumer")
         self.store = OrderDataStore.getInstance()
-        self.kafkaconsumer=KafkaConsumer(EventBackboneConfig.getOrderTopicName(),
-                                        EventBackboneConfig.getConsumerGroup(), AUTO_COMMIT)
+        self.kafkaconsumer=KafkaAvroCDCConsumer('OrderConsumer',
+                                                EventBackboneConfig.getOrderTopicName(),
+                                                EventBackboneConfig.getConsumerGroup(),
+                                                AUTO_COMMIT)
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
-        logging.info("[OrderConsumer] - Starting to consume Events from " + EventBackboneConfig.getOrderTopicName())
+        # logging.info("[OrderConsumer] - Starting to consume Events from " + EventBackboneConfig.getOrderTopicName())
         x.start()
     
     def processEvents(self):
+        print("[OrderConsumer] - Starting to consume events")
         try:   
             while True:
-                logging.info("[OrderConsumer] - consume Events")
-                event = self.kafkaconsumer.pollNextEvent()
+                # logging.info("[OrderConsumer] - consume Events")
+                event = self.kafkaconsumer.pollNextRawEvent()
                 if event is not None:
+                    event_value = event.value()
                     #logging.info('[OrderConsumer] - New event consumed: ' + json.dumps(event.value()))
-                    event_json = event.value().replace("\\","")
-                    logging.info("[OrderConsumer] event= " + str(event_json))
-                    # self.store.processOrder(event_json['orderID'],event_json)
+                    order_json = json.loads(event_value['after']['payload'])
+                    print('[OrderConsumer] - New Order: ' + json.dumps(order_json))
+                    self.store.processOrder(order_json['orderID'],order_json)
                     if not AUTO_COMMIT:
                         self.kafkaconsumer.commitEvent(event)
         except Exception as e: 

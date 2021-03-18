@@ -23,19 +23,23 @@ class InventoryConsumer:
     to consume events about vaccine lots manufactured 
     """
     def __init__(self):
-        logging.info("[InventoryConsumer] - Initializing the consumer")
+        # logging.info("[InventoryConsumer] - Initializing the consumer")
+        print("[InventoryConsumer] - Initializing the consumer")
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
         self.store = InventoryDataStore()
-        self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
-                                        EventBackboneConfig.getInventoryTopicName(),
-                                        EventBackboneConfig.getConsumerGroup(), AUTO_COMMIT)
+        self.kafkaconsumer=KafkaAvroConsumer('InventoryConsumer',
+                                            json.dumps(self.cloudEvent_schema.to_json()),
+                                            EventBackboneConfig.getInventoryTopicName(),
+                                            EventBackboneConfig.getConsumerGroup(),
+                                            AUTO_COMMIT)
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
-        logging.info("[InventoryConsumer] - Starting to consume Events")
+        # logging.info("[InventoryConsumer] - Starting to consume Events")
         x.start()
     
     def processEvents(self):
+        print("[InventoryConsumer] - Starting to consume events")
         try:   
             while True:
                 event = self.kafkaconsumer.pollNextRawEvent()

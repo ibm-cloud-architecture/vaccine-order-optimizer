@@ -34,8 +34,15 @@ def getTransportationTopicName():
 
 def getOrderTopicName():
     return os.getenv("ORDER_TOPIC","vaccine.public.orderevents")
+
 def getConsumerGroup():
     return os.getenv("CONSUMER_GROUP","vaccine-optimizer")
+
+def getKeySubject():
+    return getOrderTopicName() + '-key'
+
+def getValueSubject():
+    return getOrderTopicName() + '-value'
 
 
 def getSchemaRegistryConf():
@@ -44,10 +51,10 @@ def getSchemaRegistryConf():
             # https://KAFKA_USER:KAFKA_PASSWORD@SCHEMA_REGISTRY_URL
             # Make sure the SCHEMA_REGISTRY_URL your provide is in the form described above.
             url = os.environ['SCHEMA_REGISTRY_URL']
-            if (url.find("@") < 0 ):
-                url="https://" + os.getenv('KAFKA_USER') + ":" + os.getenv('KAFKA_PASSWORD') + "@" + url
-            elif (url.find("https") < 0 ):
-                url = "https://" + url
+            # if (url.find("@") < 0 ):
+            #     url="https://" + os.getenv('KAFKA_USER') + ":" + os.getenv('KAFKA_PASSWORD') + "@" + url
+            # elif (url.find("https") < 0 ):
+            #     url = "https://" + url
             # If we are talking to ES on prem, it uses an SSL self-signed certificate.
             # Therefore, we need the CA public certificate for the SSL connection to happen.
             if (os.path.isfile(os.getenv('KAFKA_CERT','/app/certs/es-cert.pem'))):
@@ -144,24 +151,24 @@ def getConsumerConfiguration(groupID, autocommit, key_deserializer, value_deseri
             print('[KafkaAvroConsumer] - [ERROR] - A required environment variable does not exist: ' + error)
             return {} 
 
-def printConsumerConfiguration(options,url):
+def printConsumerConfiguration(logging_prefix,options,url):
         # Printing out consumer config for debugging purposes        
-        print("[KafkaAvroConsumer] - This is the configuration for the consumer:")
-        print("[KafkaAvroConsumer] - -------------------------------------------")
-        print('[KafkaAvroConsumer] - Bootstrap Server:      {}'.format(options['bootstrap.servers']))
-        print('[KafkaAvroConsumer] - Schema Registry url:   {}'.format(url.split('@')[-1]))
+        print(logging_prefix + ' - This is the configuration for the consumer:')
+        print(logging_prefix + ' - -------------------------------------------')
+        print(logging_prefix + ' - Bootstrap Server:      {}'.format(options['bootstrap.servers']))
+        print(logging_prefix + ' - Schema Registry url:   {}'.format(url.split('@')[-1]))
         if (os.getenv('KAFKA_PASSWORD','') != ''):
             # Obfuscate password
             if (len(options['sasl.password']) > 3):
                 obfuscated_password = options['sasl.password'][0] + "*****" + options['sasl.password'][len(options['sasl.password'])-1]
             else:
                 obfuscated_password = "*******"
-            print('[KafkaAvroConsumer] - Security Protocol:     {}'.format(options['security.protocol']))
-            print('[KafkaAvroConsumer] - SASL Mechanism:        {}'.format(options['sasl.mechanisms']))
-            print('[KafkaAvroConsumer] - SASL Username:         {}'.format(options['sasl.username']))
-            print('[KafkaAvroConsumer] - SASL Password:         {}'.format(obfuscated_password))
+            print(logging_prefix + ' - Security Protocol:     {}'.format(options['security.protocol']))
+            print(logging_prefix + ' - SASL Mechanism:        {}'.format(options['sasl.mechanisms']))
+            print(logging_prefix + ' - SASL Username:         {}'.format(options['sasl.username']))
+            print(logging_prefix + ' - SASL Password:         {}'.format(obfuscated_password))
             if (os.path.isfile(os.getenv('KAFKA_CERT','/certs/es-cert.pem'))): 
-                print('[KafkaAvroConsumer] - SSL CA Location:       {}'.format(options['ssl.ca.location']))
-        print('[KafkaAvroConsumer] - Offset Reset:          {}'.format(options['auto.offset.reset']))
-        print('[KafkaAvroConsumer] - Autocommit:            {}'.format(options['enable.auto.commit']))
-        print("[KafkaAvroConsumer] - -------------------------------------------")
+                print(logging_prefix + ' - SSL CA Location:       {}'.format(options['ssl.ca.location']))
+        print(logging_prefix + ' - Offset Reset:          {}'.format(options['auto.offset.reset']))
+        print(logging_prefix + ' - Autocommit:            {}'.format(options['enable.auto.commit']))
+        print(logging_prefix + ' - -------------------------------------------')

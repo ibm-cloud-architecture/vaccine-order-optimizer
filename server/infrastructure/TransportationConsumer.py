@@ -4,6 +4,8 @@ import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 import server.infrastructure.kafka.avroUtils as avroUtils
 from server.infrastructure.TransportationDataStore import TransportationDataStore
 
+AUTO_COMMIT = False
+
 class TransportationConsumer(object):
 
     instance = None
@@ -20,20 +22,24 @@ class TransportationConsumer(object):
     """
 
     def __init__(self):
-        logging.info("[TransportationConsumer] - Initializing the consumer")
+        # logging.info("[TransportationConsumer] - Initializing the consumer")
+        print("[TransportationConsumer] - Initializing the consumer")
         self.index=0
         self.store = TransportationDataStore()
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
-        self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
+        self.kafkaconsumer=KafkaAvroConsumer('TransportationConsumer',
+                                            json.dumps(self.cloudEvent_schema.to_json()),
                                             EventBackboneConfig.getTransportationTopicName(),
-                                            EventBackboneConfig.getConsumerGroup(),False)
+                                            EventBackboneConfig.getConsumerGroup(),
+                                            AUTO_COMMIT)
 
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
-        logging.info("[TransportationConsumer] - Starting to consume Events")
+        # logging.info("[TransportationConsumer] - Starting to consume Events")
         x.start()
     
     def processEvents(self):
+        print("[TransportationConsumer] - Starting to consume events")
         try:
             while True:
                 event = self.kafkaconsumer.pollNextRawEvent()     
@@ -41,6 +47,8 @@ class TransportationConsumer(object):
                     logging.info('[TransportationConsumer] - New event consumed: ' + json.dumps(event.value()))
                     event_json = event.value()['data']
                     self.store.addTransportation(event.key(),event_json)
+                    if not AUTO_COMMIT:
+                        self.kafkaconsumer.commitEvent(event)
         finally:
             self.kafaconsumer.close()
 

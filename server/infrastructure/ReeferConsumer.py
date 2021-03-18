@@ -5,6 +5,8 @@ import server.infrastructure.kafka.avroUtils as avroUtils
 from server.infrastructure.ReeferDataStore import ReeferDataStore
 import logging
 
+AUTO_COMMIT = False
+
 class ReeferConsumer:
 
     instance = None
@@ -21,19 +23,23 @@ class ReeferConsumer:
     """
     
     def __init__(self):
-        logging.info("[ReeferConsumer] - Initializing the consumer")
+        # logging.info("[ReeferConsumer] - Initializing the consumer")
+        print("[ReeferConsumer] - Initializing the consumer")
         self.store = ReeferDataStore()
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
-        self.kafkaconsumer=KafkaAvroConsumer(json.dumps(self.cloudEvent_schema.to_json()),
-                                    EventBackboneConfig.getReeferTopicName(),
-                                    EventBackboneConfig.getConsumerGroup(),False)
+        self.kafkaconsumer=KafkaAvroConsumer('ReeferConsumer',
+                                            json.dumps(self.cloudEvent_schema.to_json()),
+                                            EventBackboneConfig.getReeferTopicName(),
+                                            EventBackboneConfig.getConsumerGroup(),
+                                            AUTO_COMMIT)
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
-        logging.info("[ReeferConsumer] - Starting to consume Events")
+        # logging.info("[ReeferConsumer] - Starting to consume Events")
         x.start()
     
     def processEvents(self):
+        print("[ReeferConsumer] - Starting to consume events")
         try:
             while True:
                 event = self.kafkaconsumer.pollNextRawEvent()
@@ -41,6 +47,8 @@ class ReeferConsumer:
                     logging.info('[ReeferConsumer] - New event consumed: ' + json.dumps(event.value()))
                     event_json = event.value()['data']
                     self.store.addReefer(event.key(),event_json)
+                    if not AUTO_COMMIT:
+                        self.kafkaconsumer.commitEvent(event)
         finally:
                 self.kafaconsumer.close()
 
