@@ -33,32 +33,37 @@ from server.infrastructure.TransportationConsumer import TransportationConsumer
 # Flask configuration
 app = Flask(__name__)
 order_consumer = OrderConsumer.getInstance()
+
+# Inventory
 inventory_consumer = InventoryConsumer.getInstance()
 inventoryApi.add_resource(DataInventory, 
-          "/api/v1/data/inventory",
-          resource_class_kwargs={'inventoryStore': inventory_consumer.getStore()})
+                          "/api/v1/data/inventory",
+                          resource_class_kwargs={'inventoryStore': inventory_consumer.getStore()})
 inventoryApi.add_resource(DataInventoryPandas, 
-        "/api/v1/data/inventory/pandas",
-        resource_class_kwargs={'inventoryStore': inventory_consumer.getStore()})
+                          "/api/v1/data/inventory/pandas",
+                          resource_class_kwargs={'inventoryStore': inventory_consumer.getStore()})
 app.register_blueprint(data_inventory_blueprint)
 
+# Reefer
 reefer_consumer = ReeferConsumer.getInstance()
 reeferApi.add_resource(ReeferResource, 
-                  "/api/v1/data/reefers",
-                 resource_class_kwargs={'reeferStore': reefer_consumer.getStore()} )
+                      "/api/v1/data/reefers",
+                      resource_class_kwargs={'reeferStore': reefer_consumer.getStore()} )
 
+# Transportation
 transportation_consumer = TransportationConsumer.getInstance()
 transportApi.add_resource(TransportationResource,
-        "/api/v1/data/transportations",
-        resource_class_kwargs={'transportationStore': transportation_consumer.getStore()} )
+                          "/api/v1/data/transportations",
+                          resource_class_kwargs={'transportationStore': transportation_consumer.getStore()} )
 
+# Optimizer
 optimizerAPI.add_resource(OrderOptimizer, 
-            "/api/v1/optimize",
-            resource_class_kwargs= {
-              'inventoryStore': inventory_consumer.getStore(),
-              'reeferStore': reefer_consumer.getStore(),
-              'transportationStore': transportation_consumer.getStore()
-              })
+                          "/api/v1/optimize",
+                          resource_class_kwargs= {
+                                  'inventoryStore': inventory_consumer.getStore(),
+                                  'reeferStore': reefer_consumer.getStore(),
+                                  'transportationStore': transportation_consumer.getStore()
+                          })
 
 app.register_blueprint(orders_blueprint)
 app.register_blueprint(optimize_blueprint)
@@ -66,10 +71,6 @@ app.register_blueprint(data_reefer_blueprint)
 app.register_blueprint(data_transportation_blueprint)
 app.register_blueprint(health_bp)
 app.register_blueprint(metrics_bp)
-
-
-
-
 
 
 # Print JSON responses with indentation for our flask application
@@ -96,10 +97,13 @@ swagger_template = {
   ],
 }
 
-
 swagger = Swagger(app, template=swagger_template)
 
-
+# Start the consumers
+reefer_consumer.startProcessing()
+transportation_consumer.startProcessing()
+inventory_consumer.startProcessing()
+order_consumer.startProcessing()
 
 # It is considered bad form to return an error for '/', so let's redirect to the apidocs
 @app.route('/')

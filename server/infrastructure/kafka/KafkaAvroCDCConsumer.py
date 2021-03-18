@@ -8,35 +8,55 @@ from confluent_kafka.serialization import StringDeserializer
 
 POLL_TIMEOUT=5.0
 
-class KafkaAvroConsumer:
+class KafkaAvroCDCConsumer:
 
-    def __init__(self, consumer_name, value_schema, topic_name = "kafka-avro-producer", groupID = 'KafkaAvroConsumer', autocommit = True):
+    def __init__(self, consumer_name, topic_name = "kafka-avro-producer", groupID = 'KafkaAvroConsumer', autocommit = True):
 
         # Consumer name for logging purposes
-        self.logging_prefix = '['+ consumer_name + '][KafkaAvroConsumer]'
+        self.logging_prefix = '['+ consumer_name + '][KafkaAvroCDCConsumer]'
 
         # Schema Registry configuration
         self.schema_registry_conf = EventBackboneConfig.getSchemaRegistryConf()
         # Schema Registry Client
         self.schema_registry_client = SchemaRegistryClient(self.schema_registry_conf)
 
+        # Get Schema for the key
+        self.schema_id_key = self.schema_registry_client.get_latest_version(EventBackboneConfig.getKeySubject()).schema_id
+        # print('The Schema ID for the key is: {}'.format(self.schema_id_key))
+        self.schema_key = self.schema_registry_client.get_schema(self.schema_id_key).schema_str
+        print(self.logging_prefix + ' - Key Subject: {}'.format(EventBackboneConfig.getKeySubject()))
+        print(self.logging_prefix + ' - Key Schema:')
+        print(self.logging_prefix + ' - -----------')
+        print(self.logging_prefix + ' - ' + self.schema_key + "\n")
+        
+        # Get Schema for the value
+        self.schema_id_value = self.schema_registry_client.get_latest_version(EventBackboneConfig.getValueSubject()).schema_id
+        # print('The Schema ID for the value is: {}'.format(self.schema_id_value))
+        self.schema_value = self.schema_registry_client.get_schema(self.schema_id_value).schema_str
+        print(self.logging_prefix + ' - Value Subject: {}'.format(EventBackboneConfig.getValueSubject()))
+        print(self.logging_prefix + ' - Value Schema:')
+        print(self.logging_prefix + ' - -------------\n')
+        print(self.logging_prefix + ' - ' + self.schema_value + '\n')
+
         # Key Deserializer
-        self.key_deserializer = StringDeserializer('utf_8')
+        self.key_deserializer = AvroDeserializer(self.schema_key,self.schema_registry_client)
+
         # Value Deserializer
         # Presenting the schema to the Avro Deserializer is needed at the moment. In the future it might change
         # https://github.com/confluentinc/confluent-kafka-python/issues/834
-        self.value_deserializer = AvroDeserializer(value_schema,self.schema_registry_client)
+        self.value_deserializer = AvroDeserializer(self.schema_value,self.schema_registry_client)
 
         # Get the consumer configuration
         self.consumer_conf = EventBackboneConfig.getConsumerConfiguration(groupID, autocommit, 
-                                                                        self.key_deserializer,
-                                                                        self.value_deserializer)
+                    self.key_deserializer,
+                    self.value_deserializer)
+        
         # Create the consumer
         self.consumer = DeserializingConsumer(self.consumer_conf)
-
+        
         # Print consumer configuration
         EventBackboneConfig.printConsumerConfiguration(self.logging_prefix,self.consumer_conf,self.schema_registry_conf['url'])
-
+        
         # Subscribe to the topic
         self.consumer.subscribe([topic_name])
     
