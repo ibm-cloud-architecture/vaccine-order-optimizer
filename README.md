@@ -1,33 +1,34 @@
 # Vaccine Order & Reefer Optimization
 
-The use case and business problem addressed in this repository is described in [this article](https://ibm-cloud-architecture.github.io/vaccine-solution-main/design/voro/) in the main vaccine solution repository. 
+The use case and business problem addressed in this repository is described in [this article](https://ibm-cloud-architecture.github.io/vaccine-solution-main/design/voro/) of the main vaccine solution repository.
 
-This repository is the implementation of a microservice that exposes API to do the order and refrigerated tank shipping plan optimization.
+This repository is the implementation of a microservice that exposes API to do the order and refrigerated tank shipping plan optimization. This component works as event consumers to get orders, vaccine lots manufactured, and transportation information and as a producer for the shipment plans. The optimization is done with a small model with [Decision Optimization Cplex for python](https://pypi.org/project/docplex/) running in the same process, in production and bigger data model CPLEX needs to run on Cloud Pak for Data. 
 
-It also works as event consumers to get manufacturing data asynchronously from a Kafka Topic.
-
-The following diagram illustrates all the components working together to support and event-driven shipment plan real time optimization:
+The following diagram illustrates all the components working together to support an event-driven shipment plan optimization:
 
 ![](./docs/images/voro-components.png)
 
+In term of Kafka processing this component illustrates the use of AVRO schema and schema registry.
 
 ## Code Explanation
 
-The [app.py](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/app.py) includes the main code to start the Flask server. It defines APIs, starts the different Kafka Consumers:
+The [app.py](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/app.py) includes the main code to start a Flask server. It defines APIs, starts the different Kafka Consumers:
 
 * ReeferConsumer: for getting information about the refrigerator release and availability
 * InventoryConsumer: about vaccine lot inventory
 * TransportationConsumer: getting transportation constraints.
+* OrderConsumer: get the orders from the order command service.
 
-The code exposes a POST order operation and then produces updated shipment plan to integrate the new order. 
+The code exposes a POST order operation to simplify testing, combined with a POST populate test data for quick demonstration and then produces updated shipment plan to integrate the new order.
+
+The `data/avro` folder includes the different schema definition.
 
 ## Build
 
-Simply build the docker image:
+Simply build the docker image with the command `./script/buildAdd.sh` which does:
 
 ```shell
 docker build -t ibmcase/vaccine-order-optimizer .
-
 docker push ibmcase/vaccine-order-optimizer
 ```
 
@@ -68,8 +69,15 @@ docker run -ti -e KAFKA_BROKERS=$KAFKA_BROKERS -e SCHEMA_REGISTRY_URL=$SCHEMA_RE
 
 The [vaccine-gitops](https://github.com/ibm-cloud-architecture/vaccine-gitops) project includes all the needed Kustomization manifests to deploy Kafka, and the Vaccine Order Optimizer component.
 
+It can be summarized as:
+
+```shell
+
+```
+
 ## Deploy to OpenShift with EventStreams as Kafka
 
+TB refresh
 * Connect to the vaccine project using: `oc project vaccine`
 * Modify the kubernetes/configmap.yaml with the Kafka Broker URL you are using, and if you changed the topic names too. Then do:
 
