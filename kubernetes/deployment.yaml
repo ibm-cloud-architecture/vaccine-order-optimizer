@@ -34,7 +34,10 @@ spec:
             memory: 512Mi
         env:
           - name: KAFKA_USER
-            value: scram-user
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: scram-user 
           - name: KAFKA_PASSWORD
             valueFrom:
               secretKeyRef:
