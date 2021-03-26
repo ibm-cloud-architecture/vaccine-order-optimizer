@@ -3,9 +3,10 @@
 #####################
 # Set these regardless of where your Event Streams on prem or on IBM Cloud or a local Kafka instance
 export KAFKA_BROKERS=""
-export REEFER_TOPIC="vaccine-reefer"
-export INVENTORY_TOPIC="vaccine-inventory"
-export TRANSPORTATION_TOPIC="vaccine-transportation"
+export REEFER_TOPIC="vaccine.reefers"
+export INVENTORY_TOPIC="vaccine.inventory"
+export TRANSPORTATION_TOPIC="vaccine.transportation"
+export ORDER_TOPIC="vaccine.orderevents"
 export SCHEMA_REGISTRY_URL=
 ######################
 ## OCP and IBMCLOUD ##

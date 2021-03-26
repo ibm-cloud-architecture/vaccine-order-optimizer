@@ -18,8 +18,7 @@ The [app.py](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/b
 * ReeferConsumer: for getting information about the refrigerator release and availability
 * InventoryConsumer: about vaccine lot inventory
 * TransportationConsumer: getting transportation constraints.
-
-The code exposes a POST order operation and then produces updated shipment plan to integrate the new order. 
+* Order consumer: getting new order
 
 ## Build
 
@@ -27,9 +26,10 @@ Simply build the docker image:
 
 ```shell
 docker build -t ibmcase/vaccine-order-optimizer .
-
 docker push ibmcase/vaccine-order-optimizer
 ```
+
+The `./scripts/buildAll.sh` perform the previous steps.
 
 The repository includes a [github action workflow](https://github.com/ibm-cloud-architecture/vaccine-order-optimizer/blob/master/.github/workflows/dockerbuild.yaml) to build and push the image automatically to the [public docker registry.](https://hub.docker.com/repository/docker/ibmcase/vaccine-order-optimizer)
 
@@ -38,10 +38,19 @@ The flow uses a set of secrets in the git repo:
 * DOCKER_IMAGE_NAME = vaccine-order-optimizer
 * DOCKER_REPOSITORY = ibmcase
 * DOCKER_USERNAME and DOCKER_PASSWORD
+* DOCKER_REGISTRY = quay.io
+
+## Run locally with docker compose
+
+Starts Apicurio, Kafka, Zookeeper and the Optimizer.
+
+```shell
+docker-compose up -d
+```
 
 ## Run locally
 
-To run the application locally but remote connected to kafka deployed on OpenShift do the following:
+To run the application locally but remote connected to Kafka deployed on OpenShift do the following:
 
 * Get the Kafka URL, schema registry URL, the user and password and any pem file containing the server certificate.
 * The certificate needs to be under certs folder.

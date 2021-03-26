@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vaccine-order-optimizer
-        image: ibmcase/vaccine-order-optimizer
+        image: quay.io/ibmcase/vaccine-order-optimizer
         imagePullPolicy: Always
         ports:
         - containerPort: 5000

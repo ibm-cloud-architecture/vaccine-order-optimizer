@@ -285,8 +285,10 @@ class VaccineOrderOptimizer(object):
         diff = a[0][1] - a[1][1]
         return 0 if diff==0 else RDD_PENALTY_EARLY*abs(diff) if diff<0 else RDD_PENALTY_LATE*diff
 
-    def get_name(self, n): 
-        return n.split(',')[0]
+    def get_name(self, n):
+        if  type(n) == str:
+            return n.split(',')[0]
+        return str(n)
 
     def build_model(self):
         if self.debug: print('[VaccineOrderOptimizer] - [BEGIN] - build_model')
