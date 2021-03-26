@@ -45,10 +45,14 @@ class OrderOptimizer(Resource):
         # Create the optimizer
         optimizer = VaccineOrderOptimizer(
             start_date=date(2020, 9, 1), debug=False)
+        # optimizer.prepare_data(OrderDataStore.getInstance().getOrdersAsPanda(),
+        #                        self.reeferStore.getAllReefersAsPanda(),
+        #                        self.inventoryStore.getAllLotInventoryAsPanda(),
+        #                        self.transportationStore.getAllTransportationsAsPanda())
         optimizer.prepare_data(OrderDataStore.getInstance().getOrdersAsPanda(),
-                               self.reeferStore.getAllReefersAsPanda(),
-                               self.inventoryStore.getAllLotInventoryAsPanda(),
-                               self.transportationStore.getAllTransportationsAsPanda())
+                               ReeferDataStore.getInstance().getAllReefersAsPanda(),
+                               InventoryDataStore.getInstance().getAllLotInventoryAsPanda(),
+                               TransportationDataStore.getInstance().getAllTransportationsAsPanda())
         optimizer.optimize()
 
         # Get the optimization solution

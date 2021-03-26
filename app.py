@@ -32,7 +32,7 @@ from server.infrastructure.TransportationConsumer import TransportationConsumer
 
 # Flask configuration
 app = Flask(__name__)
-order_consumer = OrderConsumer.getInstance()
+# order_consumer = OrderConsumer.getInstance()
 
 # Inventory
 inventory_consumer = InventoryConsumer.getInstance()
@@ -56,14 +56,18 @@ transportApi.add_resource(TransportationResource,
                           "/api/v1/data/transportations",
                           resource_class_kwargs={'transportationStore': transportation_consumer.getStore()} )
 
+# Order
+order_consumer = OrderConsumer.getInstance(inventory_consumer.getStore(),reefer_consumer.getStore(),transportation_consumer.getStore())
+# order_consumer = OrderConsumer.getInstance()
+
 # Optimizer
-optimizerAPI.add_resource(OrderOptimizer, 
-                          "/api/v1/optimize",
-                          resource_class_kwargs= {
-                                  'inventoryStore': inventory_consumer.getStore(),
-                                  'reeferStore': reefer_consumer.getStore(),
-                                  'transportationStore': transportation_consumer.getStore()
-                          })
+# optimizerAPI.add_resource(OrderOptimizer, 
+#                           "/api/v1/optimize",
+#                           resource_class_kwargs= {
+#                                   'inventoryStore': inventory_consumer.getStore(),
+#                                   'reeferStore': reefer_consumer.getStore(),
+#                                   'transportationStore': transportation_consumer.getStore()
+                          # })
 
 app.register_blueprint(orders_blueprint)
 app.register_blueprint(optimize_blueprint)

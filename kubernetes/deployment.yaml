@@ -51,6 +51,8 @@ spec:
             value: "True"
           - name: FLASK_DEBUG
             value: "False"
+          - name: DEBUG_OPTIMIZATION
+            value: "False"
         expose: true
         volumeMounts:
             - name: kafka-cert
