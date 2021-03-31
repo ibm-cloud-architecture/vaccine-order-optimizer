@@ -1,11 +1,10 @@
-import json, threading, time, os
+import json, threading, time, os, uuid, datetime
 from server.infrastructure.kafka.KafkaAvroCDCConsumer import KafkaAvroCDCConsumer
+from server.infrastructure.kafka.KafkaAvroProducer import KafkaAvroProducer
 import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 from server.infrastructure.OrderDataStore import OrderDataStore
-# from server.infrastructure.ReeferDataStore import ReeferDataStore
-# from server.infrastructure.InventoryDataStore import InventoryDataStore
-# from server.infrastructure.TransportationDataStore import TransportationDataStore
 from server.domain.doaf_vaccine_order_optimizer import VaccineOrderOptimizer
+import server.infrastructure.kafka.avroUtils as avroUtils
 import logging
 import pandas as pd
 from datetime import date
@@ -37,6 +36,12 @@ class OrderConsumer:
                                                 EventBackboneConfig.getOrderTopicName(),
                                                 EventBackboneConfig.getConsumerGroup(),
                                                 AUTO_COMMIT)
+        # Avro data schemas location
+        self.schemas_location = "/app/data/avro/schemas/"
+        # CloudEvent Schema
+        self.cloudEvent_schema = avroUtils.getCloudEventSchema()
+        # Build the Kafka Avro Producers
+        self.kafkaproducer = KafkaAvroProducer("OrderConsumer",json.dumps(self.cloudEvent_schema.to_json()),"VOO-ShipmentPlan")
         
     def startProcessing(self):
         x = threading.Thread(target=self.processEvents, daemon=True)
@@ -73,36 +78,45 @@ class OrderConsumer:
         print('[OrderConsumer] - calling optimizeOrder')
         # Create the optimizer
         optimizer = VaccineOrderOptimizer(
-            start_date=date(2020, 9, 1), debug=self.debugOptimization)
-        # print('00000000000000')
-        # print(self.orderStore.getOrdersAsPanda())
-        # print('11111111111111')
-        # print(self.reeferStore.getAllReefersAsPanda())
-        # print('22222222222222')
-        # print(self.inventoryStore.getAllLotInventoryAsPanda())
-        # print('33333333333333')
-        # print(self.transporationStore.getAllTransportationsAsPanda())
+            start_date=date.today(), debug=self.debugOptimization)
+            # start_date=date(2020, 9, 1), debug=self.debugOptimization)
+
         optimizer.prepare_data(self.orderStore.getOrdersAsPanda(),
                             self.reeferStore.getAllReefersAsPanda(),
                             self.inventoryStore.getAllLotInventoryAsPanda(),
                             self.transporationStore.getAllTransportationsAsPanda())
         optimizer.optimize()
-        print('------LOGS------')
-        print(optimizer.getLogs())
+        if self.debugOptimization:
+            print('[OrderConsumer] - optimizeOrder summary:')
+            print(optimizer.getLogs())
 
-        # Get the optimization solution
-        plan_orders, plan_orders_details, plan_shipments = optimizer.get_sol_panda()
-        result = "Orders\n"
-        result += "------------------\n"
-        result += plan_orders.to_string() + "\n\n"
-        result += "Order Details\n"
-        result += "------------------\n"
-        result += plan_orders_details.to_string() + "\n\n"
-        result += "Shipments\n"
-        result += "------------------\n"
-        result += plan_shipments.to_string()
-        print('XXXXXXXXXXXXXXXXXXXXXXXX')
-        print(result)
+            print('\n[OrderConsumer] - optimizeOrder retults:')
+            print(optimizer.get_sol_json())
+        self.produceShipmentPlan(optimizer.get_sol_json())
 
     def debugOptimization(self):
         return (os.getenv('DEBUG_OPTIMIZATION','False') != 'False')
+
+    def produceShipmentPlan(self, sol_json):
+        print('\n[OrderConsumer] - producing shipment plan')
+        
+        shipments = json.loads(sol_json['Shipments'])
+        shipments_clean = []
+        if len(shipments) > 0:
+            for shipment in shipments:
+                shipments_clean.append({x.replace(' ', ''): v for x, v in shipment.items()})
+            event_json = {}
+            event_json['type'] = "ibm.gse.eda.vaccine.orderoptimizer.VaccineOrderCloudEvent"
+            event_json['specversion'] = "1.0"
+            event_json['source'] = "Vaccine Order Optimizer engine"
+            event_json['id'] = str(uuid.uuid4())
+            event_json['time'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            event_json['dataschema'] = "https://raw.githubusercontent.com/ibm-cloud-architecture/vaccine-order-optimizer/master/data/avro/schemas/shipment_plan.avsc"
+            event_json['datacontenttype'] =	"application/json"
+            event_json['data'] = { "Shipments": shipments_clean}
+            if self.debugOptimization:
+                print('[OrderConsumer] - Shipment Plan event to be produced:')
+                print(event_json)
+            self.kafkaproducer.publishEvent(event_json['id'],event_json,EventBackboneConfig.getShipmentPlanTopicName())
+        else:
+            print('[ERROR] - There is no shipment plan.')
