@@ -5,10 +5,14 @@ def getCloudEventSchema(schema_files_location = "/app/data/avro/schemas/",
                         cloudEvent = "cloudEvent.avsc",
                         inventory = "inventory.avsc",
                         reefer = "reefer.avsc",
-                        transportation = "transportation.avsc"):
+                        transportation = "transportation.avsc",
+                        shipmentPlan = "shipment_plan.avsc",
+                        shipment = "shipment.avsc"):
   # Read all the schemas needed in order to produce the final Container Event Schema
   known_schemas = avro.schema.Names()
   # print(known_schemas)
+  shipment_schema = LoadAvsc(schema_files_location + shipment, known_schemas)
+  shipment_plan_schema = LoadAvsc(schema_files_location + shipmentPlan, known_schemas)
   inventory_schema = LoadAvsc(schema_files_location + inventory, known_schemas)
   reefer_schema = LoadAvsc(schema_files_location + reefer, known_schemas)
   transportation_schema = LoadAvsc(schema_files_location + transportation, known_schemas)

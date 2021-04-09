@@ -1,0 +1,17 @@
+{   
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
+    "doc": "Avro data schema for shipment plans events",
+    "type":"record",
+    "name":"ShipmentPlan",
+    "fields":[
+            {
+                "name": "Shipments",
+                "type": {
+                    "type": "array",
+                    "items": "ibm.gse.eda.vaccine.orderoptimizer.Shipment",
+                    "default": []
+                },
+                "doc": "Shipment plan object that is composed of shipments"
+            }
+     ]
+}
