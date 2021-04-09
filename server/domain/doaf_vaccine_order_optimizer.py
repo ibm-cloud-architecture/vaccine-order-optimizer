@@ -15,7 +15,7 @@ RDD_PENALTY_LATE = 10
 UNMET_ORDER_PENALTY = 50
 
 Lane = namedtuple("Lane", ['lane_id', 'from_loc', 'to_loc', 'transit_time', 'reefer_cost', 'fixed_cost'])
-Order = namedtuple('Order', ['order_id', 'deliveryLocation', 'qty', 'rdd', 'priority'])
+Order = namedtuple('Order', ['orderID', 'deliveryLocation', 'qty', 'rdd', 'priority'])
 
 class VaccineOrderOptimizer(object):
     ''' Vaccine Order Optimizer: 
@@ -79,26 +79,52 @@ class VaccineOrderOptimizer(object):
     #     self.process_data()
     
     def prepare_data(self, orders, reefer, inventory, transportation): 
+        if self.debug:
+            # Print all Panda objects' columns
+            pd.options.display.max_columns = None
+            print('[VaccineOrderOptimizer] - prepare_data')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Prepare the data
         '''
         ###############
         # Question: Do we need to replace empty strings in every column?
         ###############
-        self.data['REEFER'] = reefer
+
+        # Print all Panda objects' columns
+        pd.options.display.max_columns = None
+
+        self.data['REEFER'] = reefer.transpose()
         self.data['REEFER']['date_available'] = self.data['REEFER']['date_available'].replace(r'^\s*$', np.nan, regex=True)
         self.data['REEFER']['date_available'] = pd.to_datetime(self.data['REEFER']['date_available'], format='%m/%d/%Y')
 
-        self.data['INVENTORY'] = inventory
+        self.data['INVENTORY'] = inventory.transpose()
         self.data['INVENTORY']['date_available'] = self.data['INVENTORY']['date_available'].replace(r'^\s*$', np.nan, regex=True)
         self.data['INVENTORY']['date_available'] = pd.to_datetime(self.data['INVENTORY']['date_available'], format='%m/%d/%Y')
 
-        self.data['TRANSPORTATION'] = transportation
+        self.data['TRANSPORTATION'] = transportation.transpose()
 
-        self.data['ORDERS'] = orders
+        self.data['ORDERS'] = orders.transpose()
         self.data['ORDERS']['deliveryDate'] = self.data['ORDERS']['deliveryDate'].replace(r'^\s*$', np.nan, regex=True)
-        self.data['ORDERS']['deliveryDate'] = pd.to_datetime(self.data['ORDERS']['deliveryDate'], format='%m/%d/%Y')
+        self.data['ORDERS']['deliveryDate'] = pd.to_datetime(self.data['ORDERS']['deliveryDate'], format='%Y-%m-%d')
+
+        if self.debug:
+            print('Reefer Panda Object:')
+            print('--------------------')
+            print(self.data['REEFER'])
+            print('\n' + 'Inventory Panda Object:')
+            print('-----------------------')
+            print(self.data['INVENTORY'])
+            print('\n' + 'Transportation Panda Obect:')
+            print('---------------------------')
+            print(self.data['TRANSPORTATION'])
+            print('\n' + 'Orders Panda Object:')
+            print('--------------------')
+            print(self.data['ORDERS'])
 
         self.process_data()
+        if self.debug:
+            print('---------------------------------------------------------------------------------------------\n')
 
     def process_data(self): 
         ''' Process & Verify Data
@@ -151,6 +177,10 @@ class VaccineOrderOptimizer(object):
             self.lanes[(from_loc, to_loc)] = Lane(rec['lane_id'], from_loc, to_loc, int(rec['transit_time']), rec['reefer_cost'], rec['fixed_cost'])
 
     def optimize(self): 
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [BEGIN] - optimize')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Optimize for a list of orders
         '''
         self.orders = {}
@@ -162,12 +192,12 @@ class VaccineOrderOptimizer(object):
 
             loc = rec['deliveryLocation']
             if loc in self.customer_locs: 
-                self.orders[rec['order_id']] = Order(rec['order_id'], loc, int(rec['quantity']), rdd, rec['priority'])
+                self.orders[rec['orderID']] = Order(rec['orderID'], loc, int(rec['quantity']), rdd, rec['priority'])
             else: 
-                print(f"Order {rec} is ignored due to unknown customer location")
+                print(f"Order\n{rec} \nis ignored due to unknown customer location")
 
         if self.debug: 
-            print(f"supplier Locations: {self.supplier_locs}\n")
+            print(f"Supplier Locations: {self.supplier_locs}\n")
             print(f"Customer Locations: {self.customer_locs}\n")
             print(f"Inventory Qty : {self.inv_qty}\n")
             print(f"Inventory Lots: {self.inv_lots}\n")
@@ -183,8 +213,15 @@ class VaccineOrderOptimizer(object):
         
         self.construct_network()
         self.build_model()
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [END] - optimize')
+            print('---------------------------------------------------------------------------------------------\n')
 
     def construct_network(self): 
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [BEGIN] - construct_network')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Construct time-space netwrok
         '''
         # Nodes corresponding to suppliers (supplier/day)
@@ -192,7 +229,7 @@ class VaccineOrderOptimizer(object):
         # Nodes corresponding to customers (customer/day)
         self.N_C = {(c,d) for c in self.customer_locs for d in range(self.plan_horizon+1)}
         # Nodes corresponding to orders
-        self.N_O = {(o.order_id, o.rdd) for o in self.orders.values()}
+        self.N_O = {(o.orderID, o.rdd) for o in self.orders.values()}
         # Set of nodes in the time-space network
         self.N = self.N_S | self.N_C | self.N_O
 
@@ -220,9 +257,9 @@ class VaccineOrderOptimizer(object):
         self.A_V = self.A_S | self.A_SC | self.A_CO
 
         # Vaccine order demand at order node o
-        self.D_o = {(o.order_id, o.rdd): o.qty for o in self.orders.values()}
+        self.D_o = {(o.orderID, o.rdd): o.qty for o in self.orders.values()}
         # Priority value for order node o
-        self.P_o = {(o.order_id, o.rdd): o.priority for o in self.orders.values()}
+        self.P_o = {(o.orderID, o.rdd): o.priority for o in self.orders.values()}
         # Vaccines becoming available (current inventory + new production) at supplier node s
         self.V_s = {(s,d): self.inv_qty[(s,d)] for (s,d) in self.inv_qty}
         # Reefers becoming available at node n
@@ -261,16 +298,26 @@ class VaccineOrderOptimizer(object):
         self.log_msgs.append(f" Nodes: {len(self.N)}")
         self.log_msgs.append(f" Arcs : {len(self.A)}")
 
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [END] - construct_network')
+            print('---------------------------------------------------------------------------------------------\n')
+
     def get_fulfill_penalty(self, a): 
         ''' Get Order fulfillment penalty/cost 
         '''
         diff = a[0][1] - a[1][1]
         return 0 if diff==0 else RDD_PENALTY_EARLY*abs(diff) if diff<0 else RDD_PENALTY_LATE*diff
 
-    def get_name(self, n): 
-        return n.split(',')[0]
+    def get_name(self, n):
+        if  type(n) == str:
+            return n.split(',')[0]
+        return str(n)
 
     def build_model(self):
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [BEGIN] - build_model')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Build optimization model
         '''
         self.model = Model(name=self.name)
@@ -306,7 +353,7 @@ class VaccineOrderOptimizer(object):
                                         for s in self.N_S if s[1] != self.plan_horizon],
                                    ["CON_V_BAL_SUPPLIER %s %s"%(self.get_name(s[0]), s[1]) for s in self.N_S if s[1] != self.plan_horizon])
 
-         # 5.	Balance constraint at customer for vaccine
+        # 5.	Balance constraint at customer for vaccine
         self.model.add_constraints([self.model.sum(self.var_x[(m,c)] for m in self.N if (m,c) in self.A_V)
                                     == self.model.sum(self.var_x[(c,o)] for o in self.N_O if (c,o) in self.A_CO)
                                         for c in self.N_C],
@@ -335,8 +382,15 @@ class VaccineOrderOptimizer(object):
         self.model.minimize(self.obj_logistics_fix + self.obj_logistics_var + self.obj_fulfillment + self.obj_unmet_order)
         self.solve()
         self.process_plans()
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [END] - build_model')
+            print('---------------------------------------------------------------------------------------------\n')
 
     def solve(self): 
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [BEGIN] - solve')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Solve the model
         '''
         print("Solve optimization with DO local")
@@ -367,13 +421,21 @@ class VaccineOrderOptimizer(object):
             print(f"sol_y: {self.sol_y}\n")
             print(f"sol_z: {self.sol_z}\n")
             print(f"sol_w: {self.sol_w}\n")
-            self.model.export_to_stream("model_doaf_voo.lp")
+            #self.model.export_to_stream("model_doaf_voo.lp")
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [END] - solve')
+            print('---------------------------------------------------------------------------------------------\n')
 
     def process_plans(self): 
+        if self.debug:
+            print('[VaccineOrderOptimizer] - [BEGIN] - process_plans')
+            print('---------------------------------------------------------------------------------------------\n')
+
         ''' Get plans
         '''
         arrivals = defaultdict(list)
         deliveries = defaultdict(list)
+
         for a in self.sol_x: 
             if a[1] in self.N_C: 
                 arrivals[a[1]].append([a[0][0], a[0][1], self.sol_x[a], self.get_cost(a, self.sol_y[a])])
@@ -382,17 +444,17 @@ class VaccineOrderOptimizer(object):
 
         rec_orders = []
         for o in deliveries: 
-            order_id = o[0]
-            dest = self.orders[order_id].deliveryLocation
-            order_qty = self.orders[order_id].qty
-            priority = self.orders[order_id].priority
-            rdd = self.get_date(self.orders[order_id].rdd)
+            orderID = o[0]
+            dest = self.orders[orderID].deliveryLocation
+            order_qty = self.orders[orderID].qty
+            priority = self.orders[orderID].priority
+            rdd = self.get_date(self.orders[orderID].rdd)
             min_dt = self.get_date(min(v[1] for v in deliveries[o]))
             max_dt = self.get_date(max(v[1] for v in deliveries[o]))
             del_cnt = len(deliveries[o])
             del_qty = sum(v[2] for v in deliveries[o])
             rem = self.sol_w[o] if o in self.sol_w else 0
-            rec_orders.append([order_id, dest, order_qty, priority, rdd, min_dt, max_dt, del_cnt, del_qty, rem])
+            rec_orders.append([orderID, dest, order_qty, priority, rdd, min_dt, max_dt, del_cnt, del_qty, rem])
 
         self.plan_orders = pd.DataFrame(rec_orders, columns=['Order ID', 'DeliveryLocation', 'Order Qty', 'Order Priority', 'Order RDD', 
                                                              'First Delivery', 'Last Delivery', 'Number of Deliveries', 'Delivered Qty', 'Remaining Qty'])
@@ -400,7 +462,7 @@ class VaccineOrderOptimizer(object):
 
         rec_order_details = []
         for o in deliveries: 
-            order_id = o[0]                 # Order ID
+            orderID = o[0]                 # Order ID
             del_dt = self.get_date(o[1])    # Delivery date
             for delivery in deliveries[o]: 
                 c = (delivery[0], delivery[1])
@@ -415,7 +477,7 @@ class VaccineOrderOptimizer(object):
                         qty -= s_qty
                         arrivals[c][i][2] -= s_qty
                         arrivals[c][i][3] -= s_cost
-                        rec_order_details.append([order_id, supplier, dep_dt, del_dt, s_qty, s_cost])
+                        rec_order_details.append([orderID, supplier, dep_dt, del_dt, s_qty, s_cost])
             
         self.plan_order_details = pd.DataFrame(rec_order_details, columns=['Order ID', 'Supplier', 'Departure Date', 'Delivery Date', 'Qty', 'Cost'])
         self.plan_order_details.sort_values(['Order ID', 'Supplier', 'Departure Date'], inplace=True)
@@ -446,15 +508,22 @@ class VaccineOrderOptimizer(object):
                 sol_combo[a][2] = v
 
         sol_rec = [[a[0][0], self.get_date(a[0][1]), a[1][0], self.get_date(a[1][1]), v[0], v[1], v[2], "Y" if a[0][0]==a[1][0] else "N"] + self.get_arc_info(a) for a,v in sol_combo.items()]
+
         self.sol_combo = pd.DataFrame(sol_rec, columns=['FROM_LOC', 'FROM_DATE', 'TO_LOC', 'TO_DATE', 'X', 'Y', 'Z', 
                                                 'INTRA', 'ARC_FIX_COST', 'ARC_REEFER_COST', 'ORDER_QTY', 'VACCINE SUPPLY', 'REEFER SUPPLY'])
         self.sol_combo.sort_values(['FROM_DATE', 'FROM_LOC', 'TO_DATE', 'TO_LOC'], inplace=True)
 
         if self.debug: 
+            print("plan_orders:")
             print(self.plan_orders)
+            print("\nplan_order_details:")
             print(self.plan_order_details)
+            print("\nplan_shipments:")
             print(self.plan_shipments)
+            print("\nsol_combo:")
             print(self.sol_combo)
+            print('[VaccineOrderOptimizer] - [END] - process_plans')
+            print('---------------------------------------------------------------------------------------------\n')
 
     def get_cost(self, a, reefers): 
         ''' Assess the transportation cost for the given number of reefers on an arc

@@ -56,6 +56,6 @@ class OrderResource(Resource):
                                 }
         """
         print('[OrderResource] - calling /api/v1/orders endpoint')
-        return OrderStore.getInstance().getOrders(),202
+        return OrderDataStore.getInstance().getOrders(),202
 
 api.add_resource(OrderResource, "/api/v1/orders")

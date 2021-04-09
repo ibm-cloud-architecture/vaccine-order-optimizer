@@ -36,5 +36,5 @@ class DataInventoryPandas(Resource):
     @swag_from('data_inventory_pandas.yml')
     def get(self):
         logging.debug('[DataInventoryPandasResource] - calling /api/v1/data/inventory/pandas endpoint')
-        return self.inventoryStore.getAllLotInventoryAsPanda().to_string(), 200
+        return self.inventoryStore.getAllLotInventoryAsPanda().transpose().to_string(), 200
 

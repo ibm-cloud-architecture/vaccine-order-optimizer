@@ -19,13 +19,24 @@ class KafkaAvroConsumer:
         self.schema_registry_conf = EventBackboneConfig.getSchemaRegistryConf()
         # Schema Registry Client
         self.schema_registry_client = SchemaRegistryClient(self.schema_registry_conf)
-
+ 
+ 
         # Key Deserializer
         self.key_deserializer = StringDeserializer('utf_8')
+
+         # Get Schema for the value
+        self.schema_id_value = self.schema_registry_client.get_latest_version(topic_name + "-value").schema_id
+        # print('The Schema ID for the value is: {}'.format(self.schema_id_value))
+        self.value_schema = self.schema_registry_client.get_schema(self.schema_id_value).schema_str
+        print(self.logging_prefix + ' - Value Subject: {}'.format(topic_name))
+        print(self.logging_prefix + ' - Value Schema:')
+        print(self.logging_prefix + ' - -------------\n')
+        print(self.logging_prefix + ' - ' + self.value_schema + '\n')
+
         # Value Deserializer
         # Presenting the schema to the Avro Deserializer is needed at the moment. In the future it might change
         # https://github.com/confluentinc/confluent-kafka-python/issues/834
-        self.value_deserializer = AvroDeserializer(value_schema,self.schema_registry_client)
+        self.value_deserializer = AvroDeserializer(self.value_schema,self.schema_registry_client)
 
         # Get the consumer configuration
         self.consumer_conf = EventBackboneConfig.getConsumerConfiguration(groupID, autocommit, 

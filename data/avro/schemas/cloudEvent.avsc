@@ -32,18 +32,19 @@
             {
                 "name": "dataschema",
                 "type": "string",
-                "doc": "Location of the event's Avro data schema"
+                "doc": "Location of the events Avro data schema"
             },
             {
                 "name": "datacontenttype",
                 "type": "string",
-                "doc": "Type of the data attribute's content"
+                "doc": "Type of the data attributes content"
             },
             {
                 "name": "data",
                 "type": ["ibm.gse.eda.vaccine.orderoptimizer.Inventory",
                          "ibm.gse.eda.vaccine.orderoptimizer.Reefer",
-                         "ibm.gse.eda.vaccine.orderoptimizer.Transportation"],
+                         "ibm.gse.eda.vaccine.orderoptimizer.Transportation",
+                         "ibm.gse.eda.vaccine.orderoptimizer.ShipmentPlan"],
                 "doc": "The event"
             }
     ]

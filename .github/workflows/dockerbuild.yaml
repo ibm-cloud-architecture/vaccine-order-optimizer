@@ -33,7 +33,7 @@ jobs:
         validate_secret DOCKER_PASSWORD ${DOCKER_PASSWORD}
         validate_secret DOCKER_REPOSITORY ${DOCKER_REPOSITORY}
         validate_secret DOCKER_IMAGE_NAME ${DOCKER_IMAGE_NAME}
-     
+        validate_secret DOCKER_REGISTRY ${DOCKER_REGISTRY}
         if [ "${FAIL}" = "true" ]; then
           exit 1
         fi
@@ -42,7 +42,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         DOCKER_REPOSITORY: ${{ secrets.DOCKER_REPOSITORY }}
         DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
-       
+        DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
   build-docker-images:
     needs:
       validate-docker-secrets
@@ -56,8 +56,8 @@ jobs:
     - name: Build the app docker image
       id: build-container-image
       run: |
-        IMAGE_NAME="${DOCKER_R}/${DOCKER_I}"
-        docker login -u ${DOCKER_U} -p ${DOCKER_P}
+        IMAGE_NAME="${DOCKER_REG}/${DOCKER_R}/${DOCKER_I}"
+        docker login -u ${DOCKER_U} -p ${DOCKER_P} ${DOCKER_REG}
 
         echo "Build and push the docker image $IMAGE_NAME"
         cd ${WORKDIR}
@@ -69,6 +69,7 @@ jobs:
         DOCKER_P: ${{ secrets.DOCKER_PASSWORD }}
         DOCKER_R: ${{ secrets.DOCKER_REPOSITORY }}
         DOCKER_I: ${{ secrets.DOCKER_IMAGE_NAME }}
+        DOCKER_REG: ${{ secrets.DOCKER_REGISTRY }}
         WORKDIR: .
         DOCKERFILE: ./Dockerfile
         IMAGE_TAG: 0.1.0

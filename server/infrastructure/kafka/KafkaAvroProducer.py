@@ -9,8 +9,11 @@ import server.infrastructure.kafka.EventBackboneConfig as EventBackboneConfig
 
 class KafkaAvroProducer:
 
-    def __init__(self, value_schema, groupID = 'KafkaAvroProducer'):
+    def __init__(self, producer_name, value_schema, groupID = 'KafkaAvroProducer'):
         
+        # Consumer name for logging purposes
+        self.logging_prefix = '['+ producer_name + '][KafkaAvroProducer]'
+
         # Schema Registry configuration
         self.schema_registry_conf = EventBackboneConfig.getSchemaRegistryConf()
         # Schema Registry Client
@@ -25,7 +28,7 @@ class KafkaAvroProducer:
         self.producer_conf = EventBackboneConfig.getProducerConfiguration(groupID,
                         self.key_serializer,
                         self.value_serializer)
-        EventBackboneConfig.printProducerConfiguration(self.producer_conf, self.schema_registry_conf['url'])
+        EventBackboneConfig.printProducerConfiguration(self.logging_prefix, self.producer_conf, self.schema_registry_conf['url'])
         # Create the producer
         self.producer = SerializingProducer(self.producer_conf)
 

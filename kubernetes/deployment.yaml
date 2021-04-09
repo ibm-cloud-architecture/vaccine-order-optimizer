@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: vaccine-order-optimizer
-        image: ibmcase/vaccine-order-optimizer
+        image: quay.io/ibmcase/vaccine-order-optimizer
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
@@ -50,6 +50,8 @@ spec:
           - name: JSONIFY_PRETTYPRINT_REGULAR
             value: "True"
           - name: FLASK_DEBUG
+            value: "False"
+          - name: DEBUG_OPTIMIZATION
             value: "False"
         expose: true
         volumeMounts:

@@ -1,0 +1,48 @@
+{   
+    "namespace": "ibm.gse.eda.vaccine.orderoptimizer",
+    "doc": "Avro data schema for a shipment",
+    "type":"record",
+    "name":"Shipment",
+    "fields":[
+            {
+                "name": "Type",
+                "type": "string",
+                "doc": "Type of shipment"
+            },
+            {
+                "name": "From",
+                "type": "string",
+                "doc": "Location that the shipment is shipped from"
+            },
+            {
+                "name": "DepartureDate",
+                "type": "string",
+                "doc": "Departure date for the shipment"
+            },
+            {
+                "name": "To",
+                "type": "string",
+                "doc": "Location that the shipment is shipped to"
+            },
+            {
+                "name": "ArrivalDate",
+                "type": "string",
+                "doc": "Arrival date for the shipment"
+            },
+            {
+                "name": "Qty",
+                "type": "int",
+                "doc": "Vaccine quantity that this shipment carries"
+            },
+            {
+                "name": "Reefers",
+                "type": "int",
+                "doc": "Amount of refrigerated Reefer containers in this shipment"
+            },
+            {
+                "name": "Cost",
+                "type": "int",
+                "doc": "Cost of the shipment"
+            }
+     ]
+}

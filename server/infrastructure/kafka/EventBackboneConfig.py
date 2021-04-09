@@ -24,13 +24,16 @@ def getKafkaCertificate():
     return os.getenv('KAFKA_CERT','/app/certs/es-cert.pem')
 
 def getReeferTopicName():
-    return os.getenv("REEFER_TOPIC","vaccine-reefer")
+    return os.getenv("REEFER_TOPIC","vaccine.reefer")
 
 def getInventoryTopicName():
-    return os.getenv("INVENTORY_TOPIC","vaccine-inventory")
+    return os.getenv("INVENTORY_TOPIC","vaccine.inventory")
 
 def getTransportationTopicName():
-    return os.getenv("TRANSPORTATION_TOPIC","vaccine-transportation")
+    return os.getenv("TRANSPORTATION_TOPIC","vaccine.transportation")
+
+def getShipmentPlanTopicName():
+    return os.getenv("SHIPMENT_PLAN_TOPIC","vaccine.shipment.plan")
 
 def getOrderTopicName():
     return os.getenv("ORDER_TOPIC","vaccine.public.orderevents")
@@ -96,25 +99,25 @@ def getProducerConfiguration(groupID,key_serializer,value_serializer):
             print('[KafkaAvroProducer] - [ERROR] - A required environment variable does not exist: ' + error)
             return {}
     
-def printProducerConfiguration(options,url):
+def printProducerConfiguration(logging_prefix,options,url):
     # Printing out producer config for debugging purposes        
-    print("[KafkaAvroProducer] - This is the configuration for the producer:")
-    print("[KafkaAvroProducer] - -------------------------------------------")
-    print('[KafkaAvroProducer] - Bootstrap Server:      {}'.format(options['bootstrap.servers']))
-    print('[KafkaAvroProducer] - Schema Registry url:   {}'.format(url.split('@')[-1]))
+    print(logging_prefix + ' - This is the configuration for the producer:')
+    print(logging_prefix + ' - -------------------------------------------')
+    print(logging_prefix + ' - Bootstrap Server:      {}'.format(options['bootstrap.servers']))
+    print(logging_prefix + ' - Schema Registry url:   {}'.format(url.split('@')[-1]))
     if (os.getenv('KAFKA_PASSWORD','') != ''):
         # Obfuscate password
         if (len(options['sasl.password']) > 3):
             obfuscated_password = options['sasl.password'][0] + "*****" + options['sasl.password'][len(options['sasl.password'])-1]
         else:
             obfuscated_password = "*******"
-        print('[KafkaAvroProducer] - Security Protocol:     {}'.format(options['security.protocol']))
-        print('[KafkaAvroProducer] - SASL Mechanism:        {}'.format(options['sasl.mechanisms']))
-        print('[KafkaAvroProducer] - SASL Username:         {}'.format(options['sasl.username']))
-        print('[KafkaAvroProducer] - SASL Password:         {}'.format(obfuscated_password))
+        print(logging_prefix + ' - Security Protocol:     {}'.format(options['security.protocol']))
+        print(logging_prefix + ' - SASL Mechanism:        {}'.format(options['sasl.mechanisms']))
+        print(logging_prefix + ' - SASL Username:         {}'.format(options['sasl.username']))
+        print(logging_prefix + ' - SASL Password:         {}'.format(obfuscated_password))
         if (os.path.isfile(os.getenv('KAFKA_CERT','/certs/es-cert.pem'))): 
-            print('[KafkaAvroProducer] - SSL CA Location:       {}'.format(options['ssl.ca.location']))
-    print("[KafkaAvroProducer] - -------------------------------------------")
+            print(logging_prefix + ' - SSL CA Location:       {}'.format(options['ssl.ca.location']))
+    print(logging_prefix + ' - -------------------------------------------')
 
 
 def getConsumerConfiguration(groupID, autocommit, key_deserializer, value_deserializer):
