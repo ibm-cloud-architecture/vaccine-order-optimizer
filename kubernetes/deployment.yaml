@@ -27,7 +27,7 @@ spec:
           - configMapRef:
               name: kafka-topics-cm
           - secretRef:
-              name: vaccine-oro-secret
+              name: kafka-schema-registry
         resources:
           limits:
             cpu: 200m

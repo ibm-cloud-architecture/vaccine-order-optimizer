@@ -1,7 +1,7 @@
 import os
 
 def getKafkaBrokers():
-    return os.getenv('KAFKA_BROKERS','localhost:9092')
+    return os.getenv('KAFKA_BOOTSTRAP_SERVERS','localhost:9092')
 
 def getSchemaRegistryUrl():
     return os.getenv('SCHEMA_REGISTRY_URL','localhost:9092')
