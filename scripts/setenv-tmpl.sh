@@ -2,7 +2,7 @@
 ## Main properties ##
 #####################
 # Set these regardless of where your Event Streams on prem or on IBM Cloud or a local Kafka instance
-export KAFKA_BOOTSTRAP_SERVERS=""
+export KAFKA_BROKERS=""
 export REEFER_TOPIC="vaccine.reefers"
 export INVENTORY_TOPIC="vaccine.inventory"
 export TRANSPORTATION_TOPIC="vaccine.transportation"
