@@ -18,7 +18,6 @@ class DataProducer:
         self.schemas_location = "/app/data/avro/schemas/"
         # self.cloudEvent_schema = self.inventory_schema = avroUtils.getCloudEventSchema(self.schemas_location,"cloudEvent.avsc","inventory.avsc","reefer.avsc","transportation.avsc")
         self.cloudEvent_schema = avroUtils.getCloudEventSchema()
-        print('11111111111111111111111')
         print(self.cloudEvent_schema.to_json())
         # Build the Kafka Avro Producers
         self.kafkaproducer_inventory = KafkaAvroProducer("DataProducer_Inventory",json.dumps(self.cloudEvent_schema.to_json()),"VOO-Inventory")

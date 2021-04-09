@@ -2,9 +2,9 @@
 {"reefer_id":"RC00002","status":"Ready","location":"Beerse, Belgium","date_available":""}
 {"reefer_id":"RC00003","status":"Ready","location":"Titusville, N.J.","date_available":""}
 {"reefer_id":"RC00004","status":"Ready","location":"Titusville, N.J.","date_available":""}
-{"reefer_id":"RC00005","status":"In-Transit","location":"Paris, France","date_available":"4/1/2021"}
-{"reefer_id":"RC00006","status":"In-Transit","location":"Paris, France","date_available":"4/2/2021"}
-{"reefer_id":"RC00007","status":"In-Transit","location":"Paris, France","date_available":"4/3/2021"}
-{"reefer_id":"RC00008","status":"In-Transit","location":"London, England","date_available":"4/1/2021"}
-{"reefer_id":"RC00009","status":"In-Transit","location":"London, England","date_available":"4/2/2021"}
-{"reefer_id":"RC00010","status":"In-Transit","location":"London, England","date_available":"4/3/2021"}
+{"reefer_id":"RC00005","status":"In-Transit","location":"Paris, France","date_available":"4/5/2021"}
+{"reefer_id":"RC00006","status":"In-Transit","location":"Paris, France","date_available":"4/6/2021"}
+{"reefer_id":"RC00007","status":"In-Transit","location":"Paris, France","date_available":"4/7/2021"}
+{"reefer_id":"RC00008","status":"In-Transit","location":"London, England","date_available":"4/5/2021"}
+{"reefer_id":"RC00009","status":"In-Transit","location":"London, England","date_available":"4/6/2021"}
+{"reefer_id":"RC00010","status":"In-Transit","location":"London, England","date_available":"4/7/2021"}
