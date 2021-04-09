@@ -44,7 +44,7 @@ services:
     ports:
       - 5000:5000
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_BROKERS: kafka:9092
       SCHEMA_REGISTRY_URL: http://apicurio:8080/api
       INVENTORY_TOPIC: vaccine.inventory
       REEFER_TOPIC: vaccine.reefers
