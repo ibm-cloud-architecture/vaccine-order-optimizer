@@ -27,7 +27,7 @@ spec:
           - configMapRef:
               name: kafka-topics-cm
           - secretRef:
-              name: vaccine-oro-secret
+              name: kafka-schema-registry
         resources:
           limits:
             cpu: 200m
@@ -43,6 +43,11 @@ spec:
               secretKeyRef:
                 key: password
                 name: scram-user 
+          - name: KAFKA_BROKERS
+            valueFrom:
+              configMapKeyRef:
+                key: KAFKA_BOOTSTRAP_SERVERS_EXT
+                name: kafka-topics-cm
           - name: KAFKA_CERT
             value: "/app/certs/ca.crt"
           - name: PYTHONUNBUFFERED
