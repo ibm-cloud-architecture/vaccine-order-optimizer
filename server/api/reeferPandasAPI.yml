@@ -1,0 +1,12 @@
+Get Reefer data in Pandas format
+---
+responses:
+  202:
+    description: Reefer data in Pandas format
+    schema:
+      example: |
+            . reefer_id      status          location date_available
+            0   RC00001       Ready   Beerse, Belgium            NaT
+            1   RC00002       Ready  Titusville, N.J.            NaT
+            2   RC00003  In-Transit     Paris, France     2021-04-12
+            3   RC00004  In-Transit   London, England     2021-04-12

@@ -29,4 +29,14 @@ class ReeferResource(Resource):
         logging.debug(list)
         return  list,200,  {'Content-Type' : 'application/json'}
 
+class ReeferPandasResource(Resource):  
+    def __init__(self, reeferStore):
+        self.reeferStore = reeferStore
+    
+    # Returns the Reefer data in pandas format
+    @track_requests
+    @swag_from('reeferPandasAPI.yml')
+    def get(self):
+        logging.debug('[ReeferPandasResource] - calling /api/v1/data/reefers/pandas endpoint')
+        return Response(self.reeferStore.getAllReefersAsPanda().transpose().to_string(), 202, {'Content-Type': 'text/plaintext'})
 

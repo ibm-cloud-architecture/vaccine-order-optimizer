@@ -81,9 +81,9 @@ class ExternalSystemsSimulator(Resource):
         ---
         responses:
           202:
-            examples:
-                loaded
-
+            description: Simulation data successfully loaded
+            schema:
+                example: loaded
         """
         dataSimulator = DataProducer()
         dataSimulator.produceData()

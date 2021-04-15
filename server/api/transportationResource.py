@@ -29,3 +29,14 @@ class TransportationResource(Resource):
         list = self.store.getAllTransportations()
         print(list)
         return list,202
+
+class TransportationPandasResource(Resource):  
+    def __init__(self, transportationStore):
+        self.transportationStore = transportationStore
+    
+    # Returns the Transportation data in pandas format
+    @track_requests
+    @swag_from('transportationPandasAPI.yml')
+    def get(self):
+        logging.debug('[TransportationResourcePandas] - calling /api/v1/data/transportations/pandas endpoint')
+        return Response(self.transportationStore.getAllTransportationsAsPanda().transpose().to_string(), 202, {'Content-Type': 'text/plaintext'})

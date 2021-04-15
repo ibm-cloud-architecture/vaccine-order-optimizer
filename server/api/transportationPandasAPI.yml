@@ -1,0 +1,12 @@
+Get Transportation data in Pandas format
+---
+responses:
+  202:
+    description: Transportation data in Pandas format
+    schema:
+      example: |
+            . lane_id          from_loc            to_loc transit_time reefer_cost  fixed_cost
+            1       1   Beerse, Belgium     Paris, France            2          10          20
+            2       2  Titusville, N.J.   London, England            2          12          20
+            3       3   Beerse, Belgium   London, England            2          11          10
+            4       4     Paris, France   Beerse, Belgium            1           6          10

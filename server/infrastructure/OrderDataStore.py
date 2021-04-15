@@ -24,4 +24,5 @@ class OrderDataStore():
         return pd.DataFrame.from_dict(self.orders)
 
     def processOrder(self, key, order_json):
+        print("[OrderDataStore] - addOrder " + str(key) + " " + str(order_json))
         self.orders[key] = order_json

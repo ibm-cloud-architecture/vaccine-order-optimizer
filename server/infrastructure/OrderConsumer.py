@@ -86,12 +86,11 @@ class OrderConsumer:
                             self.inventoryStore.getAllLotInventoryAsPanda(),
                             self.transporationStore.getAllTransportationsAsPanda())
         optimizer.optimize()
-        if self.debugOptimization:
-            print('[OrderConsumer] - optimizeOrder summary:')
-            print(optimizer.getLogs())
+        print('[OrderConsumer] - optimizeOrder summary:')
+        print(optimizer.getLogs())
 
-            print('\n[OrderConsumer] - optimizeOrder retults:')
-            print(optimizer.get_sol_json())
+        print('\n[OrderConsumer] - optimizeOrder retults:')
+        print(optimizer.get_sol_json())
         self.produceShipmentPlan(optimizer.get_sol_json())
 
     def debugOptimization(self):

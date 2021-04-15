@@ -61,7 +61,7 @@ class KafkaAvroCDCConsumer:
         self.consumer.subscribe([topic_name])
     
     def traceResponse(self, msg):
-        print(self.logging_prefix + ' - New event received\n\tTopic: {}\n\tPartition: {}\n\tOffset: {}\n\tkey: {}\n\tvalue: {}\n'
+        print(self.logging_prefix + ' - New event received\n\tTopic: {}\n\tPartition: {}\n\tOffset: {}\n\tkey: {}\n\tvalue: {}'
                     .format(msg.topic(), msg.partition(), msg.offset(), msg.key(), msg.value()))
 
     # Polls for next event

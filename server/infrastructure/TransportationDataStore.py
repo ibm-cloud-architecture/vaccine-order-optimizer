@@ -18,7 +18,7 @@ class TransportationDataStore():
         '''
         jsonArray = []
         for key,value in self.transportations.items():
-            print("getAllTransportations -> " + str(value))
+            # print("getAllTransportations -> " + str(value))
             jsonArray.append(value)
         return jsonArray
     
@@ -26,7 +26,7 @@ class TransportationDataStore():
         return pd.DataFrame.from_dict(self.transportations)
 
     def addTransportation(self,key,transportation):
-        print("addTransportation " + key + " " + str(transportation) + " " + str(self))
+        print("[TransportationDataStore] - addTransportation " + key + " " + str(transportation))
         self.transportations[key]=transportation
 
   

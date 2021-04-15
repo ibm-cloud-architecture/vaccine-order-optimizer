@@ -28,6 +28,6 @@ class ReeferDataStore():
         return pd.DataFrame.from_dict(self.reefers)
 
     def addReefer(self,key,reefer):
-        logging.info("addReefer " + key + " " + str(reefer) + " to " + str(self))
+        print("[ReeferDataStore] - addReefer " + key + " " + str(reefer))
         self.reefers[key]=reefer
 
