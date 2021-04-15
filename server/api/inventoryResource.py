@@ -1,5 +1,5 @@
 
-from flask import Blueprint
+from flask import Blueprint, Response
 from flasgger import swag_from
 from flask_restful import Resource, Api
 from server.api.prometheus import track_requests
@@ -22,7 +22,7 @@ class DataInventory(Resource):
     
     # Returns the Inventory data in JSON format
     @track_requests
-    @swag_from('data_inventory.yml')
+    @swag_from('inventoryAPI.yml')
     def get(self):
         logging.debug('[DataInventoryResource] - calling /api/v1/data/inventory endpoint')
         return self.inventoryStore.getAllLotInventory(),200, {'Content-Type' : 'application/json'}
@@ -33,8 +33,8 @@ class DataInventoryPandas(Resource):
     
     # Returns the Inventory data in pandas format
     @track_requests
-    @swag_from('data_inventory_pandas.yml')
+    @swag_from('inventoryPandasAPI.yml')
     def get(self):
         logging.debug('[DataInventoryPandasResource] - calling /api/v1/data/inventory/pandas endpoint')
-        return self.inventoryStore.getAllLotInventoryAsPanda().transpose().to_string(), 200
+        return Response(self.inventoryStore.getAllLotInventoryAsPanda().transpose().to_string(), 202, {'Content-Type': 'text/plaintext'})
 

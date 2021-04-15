@@ -26,6 +26,6 @@ class InventoryDataStore():
         return pd.DataFrame.from_dict(self.inventory)
 
     def addLotToInventory(self,key,lot):
-        print("addInventory " + key + " " + str(lot) + " " + str(self))
+        print("[InventoryDataStore] - addInventory " + key + " " + str(lot))
         self.inventory[key]=lot
     

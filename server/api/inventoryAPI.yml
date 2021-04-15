@@ -1,0 +1,26 @@
+Get Inventory data in JSON format
+---
+responses:
+  202:
+    description: Inventory data in JSON format
+    schema:
+      example:  [
+                        {
+                        "lot_id": "L0001",
+                        "qty": 200,
+                        "location": "Beerse, Belgium",
+                        "date_available": ""
+                        },
+                        {
+                        "lot_id": "L0002",
+                        "qty": 200,
+                        "location": "Beerse, Belgium",
+                        "date_available": "04/14/2021"
+                        },
+                        {
+                        "lot_id": "L0003",
+                        "qty": 200,
+                        "location": "Titusville, N.J.",
+                        "date_available": "04/14/2021"
+                        }
+                ]

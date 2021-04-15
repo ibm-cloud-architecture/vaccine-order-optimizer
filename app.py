@@ -20,8 +20,8 @@ log.setLevel(logging.ERROR)
 from server.api.orderResource import orders_blueprint
 from server.api.optimize import optimize_blueprint, OrderOptimizer, optimizerAPI
 from server.api.inventoryResource import data_inventory_blueprint, inventoryApi, DataInventory, DataInventoryPandas
-from server.api.reeferResource import data_reefer_blueprint, reeferApi, ReeferResource
-from server.api.transportationResource import data_transportation_blueprint, transportApi, TransportationResource
+from server.api.reeferResource import data_reefer_blueprint, reeferApi, ReeferResource, ReeferPandasResource
+from server.api.transportationResource import data_transportation_blueprint, transportApi, TransportationResource, TransportationPandasResource
 from server.api.health import health_bp
 from server.api.prometheus import metrics_bp
 
@@ -42,35 +42,31 @@ inventoryApi.add_resource(DataInventory,
 inventoryApi.add_resource(DataInventoryPandas, 
                           "/api/v1/data/inventory/pandas",
                           resource_class_kwargs={'inventoryStore': inventory_consumer.getStore()})
-app.register_blueprint(data_inventory_blueprint)
 
 # Reefer
 reefer_consumer = ReeferConsumer.getInstance()
 reeferApi.add_resource(ReeferResource, 
                       "/api/v1/data/reefers",
-                      resource_class_kwargs={'reeferStore': reefer_consumer.getStore()} )
+                      resource_class_kwargs={'reeferStore': reefer_consumer.getStore()})
+reeferApi.add_resource(ReeferPandasResource, 
+                          "/api/v1/data/reefers/pandas",
+                          resource_class_kwargs={'reeferStore': reefer_consumer.getStore()})
 
 # Transportation
 transportation_consumer = TransportationConsumer.getInstance()
 transportApi.add_resource(TransportationResource,
                           "/api/v1/data/transportations",
-                          resource_class_kwargs={'transportationStore': transportation_consumer.getStore()} )
+                          resource_class_kwargs={'transportationStore': transportation_consumer.getStore()})
+transportApi.add_resource(TransportationPandasResource, 
+                          "/api/v1/data/transportations/pandas",
+                          resource_class_kwargs={'transportationStore': transportation_consumer.getStore()})
 
 # Order
 order_consumer = OrderConsumer.getInstance(inventory_consumer.getStore(),reefer_consumer.getStore(),transportation_consumer.getStore())
-# order_consumer = OrderConsumer.getInstance()
-
-# Optimizer
-# optimizerAPI.add_resource(OrderOptimizer, 
-#                           "/api/v1/optimize",
-#                           resource_class_kwargs= {
-#                                   'inventoryStore': inventory_consumer.getStore(),
-#                                   'reeferStore': reefer_consumer.getStore(),
-#                                   'transportationStore': transportation_consumer.getStore()
-                          # })
 
 app.register_blueprint(orders_blueprint)
 app.register_blueprint(optimize_blueprint)
+app.register_blueprint(data_inventory_blueprint)
 app.register_blueprint(data_reefer_blueprint)
 app.register_blueprint(data_transportation_blueprint)
 app.register_blueprint(health_bp)

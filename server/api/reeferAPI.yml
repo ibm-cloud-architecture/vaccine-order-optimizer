@@ -1,24 +1,32 @@
 Get Reefer data in JSON format
 ---
 responses:
-    202:
-        description: Reefer data in JSON format
-        examples:
-            application-json:  {"RC00001": {
-                                    "date_available": "", 
-                                    "location": "Beerse, Belgium", 
-                                    "reefer_id": "RC00001", 
-                                    "status": "Ready"
-                                },
-                                "RC00002": {
-                                    "date_available": "", 
-                                    "location": "Beerse, Belgium", 
-                                    "reefer_id": "RC00002", 
-                                    "status": "Ready"
-                                }, 
-                                "RC00003": {
-                                    "date_available": "", 
-                                    "location": "Titusville, N.J.", 
-                                    "reefer_id": "RC00003", 
-                                    "status": "Ready"
-                                }}
+  202:
+    description: Reefer data in JSON format
+    schema:
+      example: [
+                {
+                  "reefer_id": "RC00001",
+                  "status": "Ready",
+                  "location": "Beerse, Belgium",
+                  "date_available": ""
+                },
+                {
+                  "reefer_id": "RC00002",
+                  "status": "Ready",
+                  "location": "Titusville, N.J.",
+                  "date_available": ""
+                },
+                {
+                  "reefer_id": "RC00003",
+                  "status": "In-Transit",
+                  "location": "Paris, France",
+                  "date_available": "04/14/2021"
+                },
+                {
+                  "reefer_id": "RC00004",
+                  "status": "In-Transit",
+                  "location": "London, England",
+                  "date_available": "04/14/2021"
+                }
+              ]
